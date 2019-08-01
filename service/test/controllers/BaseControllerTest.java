@@ -80,7 +80,7 @@ public class BaseControllerTest {
     Response response = new Response();
     BaseController controller = new BaseController();
     response.put(JsonKey.MESSAGE, localizer.getMessage(IResponseMessage.INTERNAL_ERROR,null));
-    String jsonifyResponse = controller.jsonify(response);
+    String jsonifyResponse = controller.jsonifyResponseObject(response);
     assertEquals(
             "{\"id\":null,\"ver\":null,\"ts\":null,\"params\":null,\"responseCode\":\"OK\",\"result\":{\"message\":\"Process failed,please try again later.\"}}", jsonifyResponse);
   }
@@ -90,7 +90,7 @@ public class BaseControllerTest {
     Response response = new Response();
     BaseController controller = new BaseController();
     response.put(JsonKey.MESSAGE, response.getResult());
-    String jsonifyResponse = controller.jsonify(response);
+    String jsonifyResponse = controller.jsonifyResponseObject(response);
     assertEquals(StringUtils.EMPTY, jsonifyResponse);
   }
 }

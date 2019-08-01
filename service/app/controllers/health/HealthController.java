@@ -3,6 +3,7 @@ package controllers.health;
 import controllers.BaseController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+
 import play.mvc.Result;
 import play.mvc.Results;
 
@@ -14,25 +15,26 @@ import play.mvc.Results;
 public class HealthController extends BaseController {
   // Service name must be "service" for the devops monitoring.
   private static final String service = "service";
+  private static final String HEALTH_ACTOR_OPERATION_NAME = "health";
 
   /**
-   * This action method is responsible for checking Health.
+   * This action method is responsible for checking complete service and dependency Health.
    *
    * @return a CompletableFuture of success response
    */
   public CompletionStage<Result> getHealth() {
-    CompletionStage<Result> response = handleRequest();
-    return response;
+	  CompletionStage<Result> response = handleRequest(request(),null,HEALTH_ACTOR_OPERATION_NAME);
+	  return response;
   }
 
   /**
-   * This action method is responsible to check user-service health
+   * This action method is responsible to check certs-service health
    *
    * @return a CompletableFuture of success response
    */
-  public CompletionStage<Result> getUserOrgServiceHealth(String health) {
+  public CompletionStage<Result> getServiceHealth(String health) {
     CompletableFuture<String> cf = new CompletableFuture<>();
-    cf.complete(dummyResponse);
+    cf.complete(getDummyResponse());
     return service.equalsIgnoreCase(health)
         ? cf.thenApplyAsync(Results::ok)
         : cf.thenApplyAsync(Results::badRequest);
