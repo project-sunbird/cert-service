@@ -36,7 +36,7 @@ public class BaseController extends Controller { /**
     @Inject
     private HttpExecutionContext httpExecutionContext;
     protected static Localizer localizerObject = Localizer.getInstance();
-
+    private static ObjectMapper mapper = new ObjectMapper();
     /**
      * This is temporary method we use get dummyresponse to check APIs.
      *
@@ -50,7 +50,7 @@ public class BaseController extends Controller { /**
         return dummyResponse;
     }
 
-    public CompletionStage<Result> handelRequest() {
+    public CompletionStage<Result> handleRequest() {
         Http.RequestBody requestBody = request().body();
         startTrace("handelRequest");
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -171,7 +171,6 @@ public class BaseController extends Controller { /**
     public static String jsonifyResponseObject(Response response) {
 
         try {
-            ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(response);
         } catch (Exception e) {
             return JsonKey.EMPTY_STRING;
