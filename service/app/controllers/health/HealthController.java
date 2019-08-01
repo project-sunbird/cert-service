@@ -4,6 +4,11 @@ import controllers.BaseController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import org.sunbird.response.Response;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Results;
 
@@ -33,8 +38,10 @@ public class HealthController extends BaseController {
    * @return a CompletableFuture of success response
    */
   public CompletionStage<Result> getServiceHealth(String health) {
-    CompletableFuture<String> cf = new CompletableFuture<>();
-    cf.complete(getDummyResponse());
+    CompletableFuture<JsonNode> cf = new CompletableFuture<>();
+    Response response = new Response();
+    response.put(RESPONSE, SUCCESS);
+    cf.complete(Json.toJson(response));
     return service.equalsIgnoreCase(health)
         ? cf.thenApplyAsync(Results::ok)
         : cf.thenApplyAsync(Results::badRequest);

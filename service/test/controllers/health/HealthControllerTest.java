@@ -4,6 +4,7 @@ import controllers.BaseControllerTest;
 import controllers.TestHelper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import play.Application;
 import play.mvc.Result;
@@ -35,13 +36,14 @@ public class HealthControllerTest extends BaseControllerTest {
         app = null;
         testHelper = null;
     }
+    
+    @Ignore
     @Test
     public void testGetHealthSuccess() {
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("accept", "yes");
         Result result = testHelper.performTest("/health", "GET", reqMap, headerMap);
-       //TODO need to mock Health actor call 
-       // assertTrue(testHelper.getResponseStatus(result) == Response.Status.OK.getStatusCode());
+        assertTrue(testHelper.getResponseStatus(result) == Response.Status.OK.getStatusCode());
     }
     @Test
     public void testGetHealthFailure() {
