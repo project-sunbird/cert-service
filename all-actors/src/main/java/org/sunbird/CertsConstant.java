@@ -3,6 +3,8 @@ package org.sunbird;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.awt.image.Kernel;
+
 /**
  * this constant file is used to get the Constants which is used by entire actors
  */
@@ -111,8 +113,8 @@ public class CertsConstant {
     }
 
 
-    public String getSignCreator(String keyId) {
-        return String.format("%s/%s/%s", DOMAIN_URL, JsonKey.KEYS, keyId);
+    public String getSignCreator(String orgId, String keyId) {
+        return String.format("%s/%s/%s/%s%s", DOMAIN_URL,SLUG, orgId, keyId,PUBLIC_KEY_URL);
     }
 
     public String getEncryptionServiceUrl() {

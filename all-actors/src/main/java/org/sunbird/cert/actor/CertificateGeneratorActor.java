@@ -193,7 +193,7 @@ public class CertificateGeneratorActor extends BaseActor {
         if (MapUtils.isNotEmpty(keysObject)){
             String keyId = (String) keysObject.get(JsonKey.ID);
             properties.put(JsonKey.KEY_ID, keyId);
-            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(keyId));
+            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(orgId,keyId));
             properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(orgId, keyId));
             logger.info("populatePropertiesMap: keys after".concat(keyId));
         }
