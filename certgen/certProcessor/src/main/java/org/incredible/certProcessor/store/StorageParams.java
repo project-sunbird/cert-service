@@ -8,6 +8,8 @@ import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
@@ -48,6 +50,14 @@ public class StorageParams {
         String containerName=properties.get(JsonKey.CONTAINER_NAME);
         logger.info("StorageParams:upload:container name got:"+containerName);
         return cloudStorage.uploadFile(containerName, path, file, isDirectory,retryCount);
+
+    }
+
+    public void download(String fileName, String localPath, boolean isDirectory)  throws IOException {
+        logger.info("StorageParams : download : file name: " + fileName + " local path "+ localPath);
+        CloudStorage cloudStorage = new CloudStorage(storageService);
+        String containerName=properties.get(JsonKey.CONTAINER_NAME);
+        cloudStorage.downloadFile(containerName, fileName, localPath, isDirectory);
 
     }
 }

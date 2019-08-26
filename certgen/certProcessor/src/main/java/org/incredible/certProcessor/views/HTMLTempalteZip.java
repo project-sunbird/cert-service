@@ -2,14 +2,15 @@ package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.incredible.certProcessor.store.StorageParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -23,10 +24,15 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * html zip file url
      */
-    private  URL zipUrl;
+    private URL zipUrl;
 
-    public HTMLTempalteZip(URL zipUrl) {
+    private Map<String, String> properties;
+
+
+    public HTMLTempalteZip(URL zipUrl, Map<String, String> properties) {
+        this.properties = properties;
         this.zipUrl = zipUrl;
+
     }
 
     private static final int bufferSize = 4096;
@@ -41,17 +47,13 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-            HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
-            connection.setRequestMethod("GET");
-            InputStream in = connection.getInputStream();
-            String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
-            FileOutputStream out = new FileOutputStream(zipPath);
-            copy(in, out, 1024);
-            out.close();
-            in.close();
-            logger.info("Downloading Zip file from given url : success");
-            unzip(zipPath, targetDirectory.getAbsolutePath());
-            readIndexHtmlFile(targetDirectory.getAbsolutePath());
+        StorageParams storageParams = new StorageParams(properties);
+        storageParams.init();
+        storageParams.download(getZipFileName().concat(".zip"), targetDirectory.getAbsolutePath().concat("/"), false);
+        String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
+        logger.info("Downloading Zip file from given url : success");
+        unzip(zipPath, targetDirectory.getAbsolutePath());
+        readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
