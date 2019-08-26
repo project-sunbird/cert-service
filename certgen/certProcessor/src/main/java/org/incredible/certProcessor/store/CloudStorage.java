@@ -28,7 +28,7 @@ public class CloudStorage {
         return UrlManager.getSharableUrl(url,container);
          }
 
-    public static void downloadFile(String container, String fileName, String localPath, boolean isDirectory) {
+    public void downloadFile(String container, String fileName, String localPath, boolean isDirectory) {
         storageService.download(container, fileName, localPath, Option.apply(isDirectory));
     }
 }

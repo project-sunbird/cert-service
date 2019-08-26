@@ -8,9 +8,6 @@ import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
 import java.util.Map;
 
 public class StorageParams {
@@ -53,8 +50,8 @@ public class StorageParams {
 
     }
 
-    public void download(String fileName, String localPath, boolean isDirectory)  throws IOException {
-        logger.info("StorageParams : download : file name: " + fileName + " local path "+ localPath);
+    public void download(String fileName, String localPath, boolean isDirectory) {
+        logger.info("StorageParams : download : file name: " + fileName +  " to  local path "+ localPath);
         CloudStorage cloudStorage = new CloudStorage(storageService);
         String containerName=properties.get(JsonKey.CONTAINER_NAME);
         cloudStorage.downloadFile(containerName, fileName, localPath, isDirectory);
