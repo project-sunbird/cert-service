@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ *  Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
+ */
 public class HTMLTempalteZip extends HTMLTemplateProvider {
 
 
@@ -23,7 +26,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private static Logger logger = LoggerFactory.getLogger(HTMLTempalteZip.class);
 
     /**
-     * html zip file url
+     * html zip file url (relative path (uri) of container based url or pubic http url)
      */
     private String zipUrl;
 
@@ -49,14 +52,17 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
             targetDirectory.mkdirs();
         }
         String zipFileName = getZipFileName().concat(".zip");
-        String zipPath = targetDirectory.getAbsolutePath().concat("/") + zipFileName;
+        /**
+         * path to download zip file
+         */
+        String zipFilePath = targetDirectory.getAbsolutePath().concat("/");
         if(zipUrl.startsWith("http")) {
             logger.info("getZipFileFromURl:"+ zipUrl + " is public url");
-            logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
+            logger.info("getZipFileFromURl: downloading zip file " + zipFileName  + " to the path "+ zipFilePath +"started ");
             HttpURLConnection connection = (HttpURLConnection) new URL(zipUrl).openConnection();
             connection.setRequestMethod("GET");
             InputStream in = connection.getInputStream();
-            FileOutputStream out = new FileOutputStream(zipPath);
+            FileOutputStream out = new FileOutputStream(zipFilePath.concat(zipFileName));
             copy(in, out, 1024);
             out.close();
             in.close();
@@ -66,10 +72,10 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
             logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
-            storageParams.download(zipUrl, targetDirectory.getAbsolutePath().concat("/"), false);
+            storageParams.download(zipUrl, zipFilePath, false);
             logger.info("Downloading Zip file " + zipFileName + " from given url : success");
         }
-        unzip(zipPath, targetDirectory.getAbsolutePath());
+        unzip(zipFilePath + zipFileName, zipFilePath);
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
