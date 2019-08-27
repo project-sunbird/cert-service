@@ -2,6 +2,8 @@ package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.incredible.UrlManager;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.store.StorageParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         }
         StorageParams storageParams = new StorageParams(properties);
         storageParams.init();
-        storageParams.download(getZipFileName().concat(".zip"), targetDirectory.getAbsolutePath().concat("/"), false);
+        storageParams.download(UrlManager.getSharableUrl(zipUrl.toString(), properties.get(JsonKey.CONTAINER_NAME)), targetDirectory.getAbsolutePath().concat("/"), false);
         String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
         logger.info("Downloading Zip file from given url : success");
         unzip(zipPath, targetDirectory.getAbsolutePath());
