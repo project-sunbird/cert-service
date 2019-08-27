@@ -75,7 +75,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
             storageParams.download(zipUrl, zipFilePath, false);
             logger.info("Downloading Zip file " + zipFileName + " from given url : success");
         }
-        unzip(zipFilePath + zipFileName, zipFilePath);
+        unzip(zipFilePath.concat(zipFileName) , zipFilePath);
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
@@ -88,10 +88,10 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * unzips zip file
      *
-     * @param zipFilePath
+     * @param zipFile
      * @param destDir
      */
-    private  void unzip(String zipFilePath, String destDir) {
+    private  void unzip(String zipFile, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs();
@@ -99,7 +99,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
-            fis = new FileInputStream(zipFilePath);
+            fis = new FileInputStream(zipFile);
             ZipInputStream zipIn = new ZipInputStream(fis);
             ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
