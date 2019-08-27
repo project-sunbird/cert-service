@@ -2,13 +2,12 @@ package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.incredible.UrlManager;
-import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.store.StorageParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,12 +25,12 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * html zip file url
      */
-    private URL zipUrl;
+    private String zipUrl;
 
     private Map<String, String> properties;
 
 
-    public HTMLTempalteZip(URL zipUrl, Map<String, String> properties) {
+    public HTMLTempalteZip(String zipUrl, Map<String, String> properties) {
         this.properties = properties;
         this.zipUrl = zipUrl;
 
@@ -49,11 +48,27 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-        StorageParams storageParams = new StorageParams(properties);
-        storageParams.init();
-        storageParams.download(UrlManager.getSharableUrl(zipUrl.toString(), properties.get(JsonKey.CONTAINER_NAME)), targetDirectory.getAbsolutePath().concat("/"), false);
-        String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
-        logger.info("Downloading Zip file from given url : success");
+        String zipFileName = getZipFileName().concat(".zip");
+        String zipPath = targetDirectory.getAbsolutePath().concat("/") + zipFileName;
+        if(zipUrl.startsWith("http")) {
+            logger.info("getZipFileFromURl:"+ zipUrl + " is public url");
+            logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
+            HttpURLConnection connection = (HttpURLConnection) new URL(zipUrl).openConnection();
+            connection.setRequestMethod("GET");
+            InputStream in = connection.getInputStream();
+            FileOutputStream out = new FileOutputStream(zipPath);
+            copy(in, out, 1024);
+            out.close();
+            in.close();
+            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+        }   else {
+            logger.info("getZipFileFromURl: "+ zipUrl + " is container based  uri");
+            logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
+            StorageParams storageParams = new StorageParams(properties);
+            storageParams.init();
+            storageParams.download(zipUrl, targetDirectory.getAbsolutePath().concat("/"), false);
+            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+        }
         unzip(zipPath, targetDirectory.getAbsolutePath());
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
@@ -140,7 +155,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     public  String getZipFileName() {
         String fileName = null;
         try {
-            URI uri = new URI(zipUrl.toString());
+            URI uri = new URI(zipUrl);
             String path = uri.getPath();
             fileName = path.substring(path.lastIndexOf('/') + 1);
         } catch (URISyntaxException e) {

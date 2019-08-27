@@ -24,7 +24,6 @@ import scala.Some;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -102,7 +101,7 @@ public class CertificateGeneratorActor extends BaseActor {
         String directory;
         String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         try {
-            htmlTempalteZip = new HTMLTempalteZip(new URL(url), properties);
+            htmlTempalteZip = new HTMLTempalteZip(url, properties);
             logger.info("CertificateGeneratorActor:generateCertificate:html zip generated");
         } catch (Exception ex) {
             logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.", ex);
