@@ -180,7 +180,7 @@ public class CertsConstant {
     }
 
     /**
-     * append orgid to the domain_slug if exists
+     * appends orgId to the domain_slug if exists
      *
      * @param uri
      * @param orgId
