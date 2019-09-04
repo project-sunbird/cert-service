@@ -30,12 +30,22 @@ public class CertsConstant {
     private static final String SLUG = getSlugFormEnv();
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
-        return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, batchId, BADGE_URL);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        if(StringUtils.isNotEmpty(rootOrgId))
+            stringBuilder.append("/" +rootOrgId);
+        if(StringUtils.isNotEmpty(batchId))
+            stringBuilder.append("/" + batchId);
+        return stringBuilder.append("/" + BADGE_URL).toString();
     }
 
 
 	public String getISSUER_URL(String rootOrgId) {
-        return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, ISSUER_URL);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        if(StringUtils.isNotEmpty(rootOrgId))
+            stringBuilder.append("/" +rootOrgId);
+        return stringBuilder.append("/"+ ISSUER_URL).toString();
     }
 
     public String getCONTEXT() {
@@ -43,7 +53,12 @@ public class CertsConstant {
     }
 
     public String getPUBLIC_KEY_URL(String rootOrgId, String keyId) {
-        return String.format("%s/%s/%s/%s%s", DOMAIN_URL, SLUG, rootOrgId, keyId, PUBLIC_KEY_URL);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        if(StringUtils.isNotEmpty(rootOrgId))
+            stringBuilder.append("/" +rootOrgId);
+
+        return stringBuilder.append("/" + keyId + "/" + PUBLIC_KEY_URL).toString();
     }
 
     public String getVERIFICATION_TYPE() {
@@ -114,7 +129,11 @@ public class CertsConstant {
 
 
     public String getSignCreator(String orgId, String keyId) {
-        return String.format("%s/%s/%s/%s%s", DOMAIN_URL,SLUG, orgId, keyId,PUBLIC_KEY_URL);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        if(StringUtils.isNotEmpty(orgId))
+            stringBuilder.append("/" +orgId);
+        return stringBuilder.append(keyId + "/" + PUBLIC_KEY_URL).toString();
     }
 
     public String getEncryptionServiceUrl() {

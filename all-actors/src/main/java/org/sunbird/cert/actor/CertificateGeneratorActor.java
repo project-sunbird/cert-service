@@ -109,7 +109,7 @@ public class CertificateGeneratorActor extends BaseActor {
         }
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
-        directory = "conf/" + orgId.concat("_") + tag.concat("_") + htmlTempalteZip.getZipFileName().concat("/");
+        directory = getDirectoryName(orgId, tag, htmlTempalteZip.getZipFileName());
         List<Map<String, Object>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
             CertificateResponse certificateResponse = null;
@@ -176,7 +176,17 @@ public class CertificateGeneratorActor extends BaseActor {
             properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
-            return storageParams.upload(orgId + "/" + batchId+"/", file, false);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(" ");
+            stringBuilder.setLength(0);
+            if(StringUtils.isNotEmpty(orgId)){
+                stringBuilder.append(orgId+ "/");
+            }
+            if(StringUtils.isNotEmpty(batchId)){
+                stringBuilder.append(batchId+"/");
+            }
+            logger.info("Path of " + stringBuilder.toString());
+            return storageParams.upload(stringBuilder.toString(), file, false);
         } catch (Exception ex) {
             logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.", ex);
         }
@@ -218,4 +228,17 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
- }
+    private String  getDirectoryName(String orgId, String batchId, String zipFileName) {
+        StringBuilder sb=new StringBuilder();
+        sb.append("conf/");
+        if(StringUtils.isNotEmpty(orgId)){
+            sb.append(orgId+"_");
+        }
+        if(StringUtils.isNotEmpty(batchId)){
+            sb.append(batchId+"_");
+        }
+        logger.info("getDirectoryName: "+ sb.toString().concat(zipFileName.concat("/")));
+        return sb.toString().concat(zipFileName.concat("/"));
+
+    }
+}
