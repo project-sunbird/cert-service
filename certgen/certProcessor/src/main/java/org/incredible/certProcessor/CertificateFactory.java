@@ -36,12 +36,12 @@ public class CertificateFactory {
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
             throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
-        StringBuilder sb =new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG));
-        if(StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))){
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
             sb.append("/" + properties.get(JsonKey.ROOT_ORG_ID));
         }
-        if(StringUtils.isNotEmpty(properties.get(JsonKey.TAG))){
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
             sb.append("/" + properties.get(JsonKey.TAG));
         }
         uuid = sb.toString().concat("/" + UUID.randomUUID().toString() + ".json");
@@ -145,12 +145,12 @@ public class CertificateFactory {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
 
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            String request = mapper.writeValueAsString(certificateExtension);
-            JsonNode jsonNode = mapper.readTree(request);
-            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
-            signMap = signatureHelper.generateSignature(jsonNode, keyID);
-            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String request = mapper.writeValueAsString(certificateExtension);
+        JsonNode jsonNode = mapper.readTree(request);
+        logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
+        signMap = signatureHelper.generateSignature(jsonNode, keyID);
+        return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
 
     }
 
