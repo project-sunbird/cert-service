@@ -14,8 +14,7 @@
                 "SearchIn": "search",
                 "update": "Update",
                 "generate": "Generate",
-                "GenerateCertificate": "Certificate",
-                "preview":"Preview"
+                "GenerateCertificate": "Certificate"
             },
             "msg": {
                 "logInHead": "Log-in to your account",

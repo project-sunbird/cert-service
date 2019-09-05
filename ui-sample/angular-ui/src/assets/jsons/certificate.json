@@ -61,10 +61,10 @@
                 "code": "courseName",
                 "dataType": "text",
                 "name": "courseName",
-                "label": "Training Name",
-                "description": "Training Name",
+                "label": "Course Name",
+                "description": "Course Name",
                 "editable": true,
-                "placeholder": "Training Name",
+                "placeholder": "Course Name",
                 "inputType": "text",
                 "required": true,
                 "displayProperty": "Editable",
@@ -119,8 +119,7 @@
                 "inputType": "text",
                 "required": true,
                 "displayProperty": "Editable",
-                "visible": true,        
-                "value":"Ekstep",
+                "visible": true,
                 "renderingHints": {
                     "semanticColumnWidth": "six"
                 },
@@ -138,11 +137,27 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"http://diksha.gov.in",
                 "renderingHints": {
                     "semanticColumnWidth": "six"
                 },
                 "index": 8
+            },
+            {
+                "code": "htmlTemplateUrl",
+                "dataType": "text",
+                "name": "htmlTemplateUrl",
+                "label": "HTML Template URL",
+                "description": "HTML Template URL",
+                "editable": true,
+                "placeholder": "HTML Template URL",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "twelve"
+                },
+                "index": 9
             }
         ]
     }

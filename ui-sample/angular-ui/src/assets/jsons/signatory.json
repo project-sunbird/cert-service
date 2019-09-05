@@ -17,7 +17,6 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"John",
                 "renderingHints": {
                     "semanticColumnWidth": "three"
                 },
@@ -35,7 +34,6 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"CEO",
                 "renderingHints": {
                     "semanticColumnWidth": "three"
                 },
@@ -53,7 +51,6 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"CEO",
                 "renderingHints": {
                     "semanticColumnWidth": "two"
                 },
@@ -71,7 +68,6 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"https://daily.jstor.org/wp-content/uploads/2014/11/NapoleonSignature2_1050x700.jpg",
                 "renderingHints": {
                     "semanticColumnWidth": "four"
                 },
