@@ -120,6 +120,7 @@ export class CreateCertificateComponent implements OnInit {
   removeSignatory() {
     if (this.signatoryCount > 1) {
       this.signatory.pop()
+      this.signatoryCount --;
     }
   }
 

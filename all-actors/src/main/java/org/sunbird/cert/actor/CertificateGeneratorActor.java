@@ -108,10 +108,10 @@ public class CertificateGeneratorActor extends BaseActor {
         }
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
-        directory = getDirectoryName(orgId, tag, htmlTempalteZip.getZipFileName());
+        directory = getDirectoryName(orgId, tag, htmlTempalteZip.getZipFileName(), properties);
         List<Map<String, Object>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
-            CertificateResponse certificateResponse = null;
+            CertificateResponse certificateResponse = new CertificateResponse();
             try {
                 certificateResponse = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory);
             } catch (Exception ex) {
@@ -119,9 +119,13 @@ public class CertificateGeneratorActor extends BaseActor {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             }
-            certUrlList.add(uploadCertificate(certificateResponse, certModel.getIdentifier(), orgId, tag, directory));
-
-            cleanup(directory, certificateResponse.getUuid());
+            if(checkStorageParamsExist(properties))    {
+                certUrlList.add(uploadCertificate(certificateResponse, certModel.getIdentifier(), orgId, tag, directory));
+                cleanup(directory, certificateResponse.getUuid());
+            }
+            else {
+                certUrlList.add(getResponse(certificateResponse, certModel.getIdentifier(),  htmlTempalteZip.getZipFileName()));
+            }
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
@@ -129,14 +133,33 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("onReceive method call End");
     }
 
+    private  Map<String, Object>  getResponse(CertificateResponse certificateResponse, String recipientID, String directory )   {
+        Map<String, Object> resMap = new HashMap<>();
+        String uuid = certificateResponse.getUuid();
+        String certFileName = certVar.getDOMAIN_URL() + "/" + JsonKey.ASSETS + "/" + directory + "/" + uuid;
+        resMap.put(JsonKey.PDF_URL, certFileName +".pdf" );
+        resMap.put(JsonKey.JSON_URL, certFileName + ".json");
+        resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
+        resMap.put(JsonKey.RECIPIENT_ID, recipientID);
+        resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
+        try {
+            resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(), Map.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resMap;
+    }
+
     private void cleanup(String path, String fileName) {
         try {
-            File directory = new File(path);
-            File[] files = directory.listFiles();
-            for (File file : files) {
-                if (file.getName().startsWith(fileName)) file.delete();
+            if(StringUtils.isNotBlank(fileName))    {
+                File directory = new File(path);
+                File[] files = directory.listFiles();
+                for (File file : files) {
+                    if (file.getName().startsWith(fileName)) file.delete();
+                }
+                logger.info("CertificateGeneratorActor: cleanUp completed");
             }
-            logger.info("CertificateGeneratorActor: cleanUp completed");
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
@@ -184,6 +207,8 @@ public class CertificateGeneratorActor extends BaseActor {
             if (StringUtils.isNotEmpty(batchId)) {
                 stringBuilder.append(batchId + "/");
             }
+            if(StringUtils.isNotEmpty(certVar.getStoragePath()))
+                stringBuilder.append(certVar.getStoragePath());
             logger.info("Path of " + stringBuilder.toString());
             return storageParams.upload(stringBuilder.toString(), file, false);
         } catch (Exception ex) {
@@ -193,8 +218,8 @@ public class CertificateGeneratorActor extends BaseActor {
     }
 
     private HashMap<String, String> populatePropertiesMap(Request request) {
+        certVar.setCloudProperties((Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.STORE));
         HashMap<String, String> properties = new HashMap<>();
-
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
         Map<String, Object> keysObject = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS);
@@ -223,21 +248,45 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT, certVar.getCLOUD_UPLOAD_RETRY_COUNT());
         properties.put(JsonKey.AZURE_STORAGE_SECRET, certVar.getAzureStorageSecret());
         properties.put(JsonKey.AZURE_STORAGE_KEY, certVar.getAzureStorageKey());
+        properties.put(JsonKey.PATH, certVar.getStoragePath());
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
 
-    private String getDirectoryName(String orgId, String batchId, String zipFileName) {
+    private String getDirectoryName(String orgId, String batchId, String zipFileName, Map<String, String> properties) {
         StringBuilder sb = new StringBuilder();
-        sb.append("conf/");
-        if (StringUtils.isNotEmpty(orgId)) {
-            sb.append(orgId + "_");
-        }
-        if (StringUtils.isNotEmpty(batchId)) {
-            sb.append(batchId + "_");
+        if(checkStorageParamsExist(properties)) {
+            sb.append("conf/");
+            if (StringUtils.isNotEmpty(orgId)) {
+                sb.append(orgId + "_");
+            }
+            if (StringUtils.isNotEmpty(batchId)) {
+                sb.append(batchId + "_");
+            }
+        }  else   {
+            //storage params are not present , save files in public folder
+            sb.append("public/");
+            File file = new File("public");
         }
         logger.info("getDirectoryName: " + sb.toString().concat(zipFileName.concat("/")));
-        return sb.toString().concat(zipFileName.concat("/"));
+        String concat = sb.toString().concat(zipFileName.concat("/"));
+        return concat;
+    }
+
+    /**
+     * to check storage params are exist , if it is not exits save file in public assets folder
+     * @param properties
+     * @return
+     */
+    private Boolean checkStorageParamsExist(Map<String, String> properties)  {
+        Boolean preview = true;
+        List<String> keys = Arrays.asList(JsonKey.CONTAINER_NAME, JsonKey.AZURE_STORAGE_KEY, JsonKey.AZURE_STORAGE_SECRET, JsonKey.CLOUD_STORAGE_TYPE);
+        for (String key : keys) {
+            if (StringUtils.isBlank(properties.get(key))) {
+               return false;
+            }
+        }
+        return preview;
     }
 }
