@@ -97,4 +97,5 @@ public interface JsonKey {
     String ACCOUNT = "account";
     String key = "key";
     String ASSETS = "assets";
+    String PREVIEW="preview";
 }

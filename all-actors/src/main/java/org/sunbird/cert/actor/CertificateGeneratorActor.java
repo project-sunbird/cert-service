@@ -142,6 +142,7 @@ public class CertificateGeneratorActor extends BaseActor {
         resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
         resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
+        resMap.put(JsonKey.PREVIEW, true);
         try {
             resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(), Map.class));
         } catch (IOException e) {
@@ -175,6 +176,7 @@ public class CertificateGeneratorActor extends BaseActor {
         resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
         resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
+        resMap.put(JsonKey.PREVIEW, false);
         try {
             resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(), Map.class));
         } catch (IOException e) {
