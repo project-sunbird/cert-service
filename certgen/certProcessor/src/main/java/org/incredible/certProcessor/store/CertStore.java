@@ -99,7 +99,7 @@ public abstract class CertStore {
                     store.setAzureStore(azureStore);
                 }
                 if (storageType.equals(JsonKey.AWS)) {
-                    awsStore.setContainerName(getPropertyFromEnv(JsonKey.BUCKET_NAME));
+                    awsStore.setContainerName(getPropertyFromEnv(JsonKey.CONTAINER_NAME));
                     awsStore.setKey(getPropertyFromEnv(JsonKey.AWS_STORAGE_SECRET));
                     awsStore.setAccount(getPropertyFromEnv(JsonKey.AWS_STORAGE_KEY));
                     store.setAwsStore(awsStore);
