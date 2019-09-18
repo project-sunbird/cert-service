@@ -1,6 +1,7 @@
 package org.sunbird;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
@@ -34,7 +35,7 @@ public class CertMapper {
             cert.setCourseName((String) json.get(JsonKey.COURSE_NAME));
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
-            String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
+                String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
             if(StringUtils.isBlank(issuedDate)){
                 cert.setIssuedDate(getCurrentDate());
             } else {

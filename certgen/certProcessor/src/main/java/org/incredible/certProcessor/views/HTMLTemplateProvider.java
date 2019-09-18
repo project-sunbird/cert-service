@@ -6,11 +6,16 @@ import org.apache.velocity.runtime.parser.node.ASTReference;
 import org.apache.velocity.runtime.parser.node.ParserVisitor;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.runtime.visitor.BaseVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
+import java.io.File;
 import java.util.HashSet;
 
 public abstract class HTMLTemplateProvider {
+
+    private static Logger logger = LoggerFactory.getLogger(HTMLTemplateProvider.class);
 
     abstract public String getTemplateContent(String filePath) throws Exception;
 
@@ -28,6 +33,19 @@ public abstract class HTMLTemplateProvider {
         }
     }
 
+    /**
+     * to check file is  exists or not
+     * @param file
+     * @return
+     */
+    public static Boolean isFileExists(File file){
+        boolean isExits = false;
+        if (file.exists()) {
+            isExits = true;
+            logger.info( file.getName() + " file exists ");
+        } else isExits = false;
+        return isExits;
+    }
 
     /**
      * to get all the reference variables present in htmlString

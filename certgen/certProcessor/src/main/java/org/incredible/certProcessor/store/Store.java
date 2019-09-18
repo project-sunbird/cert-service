@@ -9,13 +9,11 @@ public class Store {
 
     private String type;
 
-    private String containerName;
+    private String cloudRetryCount = "3";
 
-    private String path;
+    private AWSStore awsStore;
 
-    private String account;
-
-    private String key;
+    private AzureStore azureStore;
 
     public Store() {
     }
@@ -28,36 +26,28 @@ public class Store {
         this.type = type;
     }
 
-    public String getContainerName() {
-        return containerName;
+    public AWSStore getAwsStore() {
+        return awsStore;
     }
 
-    public void setContainerName(String containerName) {
-        this.containerName = containerName;
+    public void setAwsStore(AWSStore awsStore) {
+        this.awsStore = awsStore;
     }
 
-    public String getPath() {
-        return path;
+    public AzureStore getAzureStore() {
+        return azureStore;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setAzureStore(AzureStore azureStore) {
+        this.azureStore = azureStore;
     }
 
-    public String getAccount() {
-        return account;
+    public String getCloudRetryCount() {
+        return cloudRetryCount;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public void setCloudRetryCount(String cloudRetryCount) {
+        this.cloudRetryCount = cloudRetryCount;
     }
 
     @Override

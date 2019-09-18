@@ -1,11 +1,12 @@
 package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.incredible.certProcessor.store.CertStore;
 import org.incredible.certProcessor.store.StorageParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.HttpMethod;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -16,14 +17,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- *  Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
+ * Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
  */
-public class HTMLTempalteZip extends HTMLTemplateProvider {
+public class HTMLTemplateZip extends HTMLTemplateProvider {
 
 
     private String content = null;
 
-    private static Logger logger = LoggerFactory.getLogger(HTMLTempalteZip.class);
+    private static Logger logger = LoggerFactory.getLogger(HTMLTemplateZip.class);
 
     /**
      * html zip file url (relative path (uri) of container based url or pubic http url)
@@ -33,7 +34,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private Map<String, String> properties;
 
 
-    public HTMLTempalteZip(String zipUrl, Map<String, String> properties) {
+    public HTMLTemplateZip(String zipUrl, Map<String, String> properties) {
         this.properties = properties;
         this.zipUrl = zipUrl;
 
@@ -47,43 +48,35 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @param targetDirectory
      * @throws IOException
      */
-    private void getZipFileFromURl(File targetDirectory) throws Exception {
+    private void downloadZipFile(File targetDirectory) throws Exception {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-        String zipFileName = getZipFileName().concat(".zip");
+        String zipFileName = getZipFileName();
         /**
          * path to download zip file
          */
         String zipFilePath = targetDirectory.getAbsolutePath().concat("/");
-        if(zipUrl.startsWith("http")) {
-            logger.info("getZipFileFromURl:"+ zipUrl + " is public url");
-            logger.info("getZipFileFromURl: downloading zip file " + zipFileName  + " to the path "+ zipFilePath +"started ");
+        if (zipUrl.startsWith("http")) {
+            logger.info("getZipFileFromURl:" + zipUrl + " is public url");
             HttpURLConnection connection = (HttpURLConnection) new URL(zipUrl).openConnection();
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod(HttpMethod.GET);
             InputStream in = connection.getInputStream();
-            FileOutputStream out = new FileOutputStream(zipFilePath.concat(zipFileName));
+            FileOutputStream out = new FileOutputStream("conf/" + zipFileName);
             copy(in, out, 1024);
             out.close();
             in.close();
-            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
-        }   else {
-            logger.info("getZipFileFromURl: "+ zipUrl + " is container based  uri");
-            logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
+        } else if (CertStore.checkStorageParamsExist()) {
+            logger.info("getZipFileFromURl: " + zipUrl + " is container based  uri");
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
-            storageParams.download(zipUrl, zipFilePath, false);
-            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+            storageParams.download(zipUrl, "conf/");
         }
-        unzip(zipFilePath.concat(zipFileName) , zipFilePath);
+        logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+        unzip("conf/" + zipFileName, zipFilePath);
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
-    private void readIndexHtmlFile(String absolutePath) throws IOException {
-        FileInputStream fis = new FileInputStream(absolutePath + "/index.html");
-        content = IOUtils.toString(fis, "UTF-8");
-        fis.close();
-    }
 
     /**
      * unzips zip file
@@ -91,13 +84,11 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @param zipFile
      * @param destDir
      */
-    private  void unzip(String zipFile, String destDir) {
+    private void unzip(String zipFile, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs();
         FileInputStream fis;
-        //buffer for read and write data to file
-        byte[] buffer = new byte[1024];
         try {
             fis = new FileInputStream(zipFile);
             ZipInputStream zipIn = new ZipInputStream(fis);
@@ -132,7 +123,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @param filePath
      * @throws IOException
      */
-    private  void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[4096];
         int read = 0;
@@ -142,7 +133,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         bos.close();
     }
 
-    private  void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+    private void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
         byte[] buf = new byte[bufferSize];
         int n = input.read(buf);
         while (n >= 0) {
@@ -158,7 +149,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      *
      * @return zip file name
      */
-    public  String getZipFileName() {
+    public String getZipFileName() {
         String fileName = null;
         try {
             URI uri = new URI(zipUrl);
@@ -167,22 +158,20 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         } catch (URISyntaxException e) {
             logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
         }
-        return StringUtils.substringBefore(fileName, ".");
+        if (!fileName.endsWith(".zip"))
+            return fileName.concat(".zip");
+        return fileName;
     }
 
-    /**
-     * checks if zip file with this name is exists or not
-     *
-     * @param zipFile
-     * @return
-     */
-    public static boolean checkZipFileExists(File zipFile) {
-        boolean isExits = false;
-        if (zipFile.exists()) {
-            isExits = true;
-            logger.info("zip file  exists : " + isExits);
-        } else isExits = false;
-        return isExits;
+    private void readIndexHtmlFile(String absolutePath) throws IOException {
+        String htmlFileName = "/index.html";
+        if (!isFileExists(new File(absolutePath + htmlFileName))) {
+            unzip("conf/" + getZipFileName(), absolutePath);
+        }
+        FileInputStream fis = new FileInputStream(absolutePath + htmlFileName);
+        content = IOUtils.toString(fis, "UTF-8");
+        fis.close();
+
     }
 
     /**
@@ -193,13 +182,13 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     @Override
     public String getTemplateContent(String filePath) throws Exception {
         if (content == null) {
-                File targetDirectory =  new File(filePath);
-                if (checkZipFileExists(new File(targetDirectory.getAbsolutePath().concat("/") + getZipFileName() + ".zip"))) {
-                    readIndexHtmlFile(targetDirectory.getAbsolutePath());
-                } else {
-                    getZipFileFromURl(targetDirectory);
-                }
+            File targetDirectory = new File(filePath);
+            if (isFileExists(new File("conf/" + getZipFileName()))) {
+                readIndexHtmlFile(targetDirectory.getAbsolutePath());
+            } else {
+                downloadZipFile(targetDirectory);
             }
+        }
         return content;
     }
 

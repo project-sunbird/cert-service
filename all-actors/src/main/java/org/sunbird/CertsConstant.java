@@ -1,12 +1,9 @@
 package org.sunbird;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.certProcessor.store.Store;
-
-import java.util.Map;
 
 /**
  * this constant file is used to get the Constants which is used by entire actors
@@ -28,13 +25,8 @@ public class CertsConstant {
     private static String CONTAINER_NAME;
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
     private static String CLOUD_STORAGE_TYPE;
-    private static String AZURE_STORAGE_SECRET;
-    private static  String AZURE_STORAGE_KEY;
     private static final String SLUG = getSlugFormEnv();
     private static final String DOMAIN_SLUG = DOMAIN_URL + "/" + SLUG;
-    private static String STORE_PATH;
-    private static Store store = new Store();
-    private ObjectMapper mapper = new ObjectMapper();
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -89,8 +81,7 @@ public class CertsConstant {
     }
 
     private static String getContainerNameFromEnv() {
-        String containerName = StringUtils.isNotBlank(store.getContainerName()) ? store.getContainerName():  getPropertyFromEnv(JsonKey.CONTAINER_NAME);
-        return containerName;
+        return  getPropertyFromEnv(JsonKey.CONTAINER_NAME);
     }
 
     private static String getPropertyFromEnv(String property) {
@@ -140,19 +131,9 @@ public class CertsConstant {
 
 
     private static String getCloudStorageTypeFromEnv() {
-        String cloudStorageType =  StringUtils.isNotBlank(store.getType()) ? store.getType() : getPropertyFromEnv(JsonKey.CLOUD_STORAGE_TYPE);
-        return cloudStorageType;
+      return   getPropertyFromEnv(JsonKey.CLOUD_STORAGE_TYPE);
     }
 
-    private static String getStorageKey() {
-        String storageKey = StringUtils.isNotBlank(store.getAccount()) ? store.getAccount() : getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
-        return storageKey;
-    }
-
-    private static String getStorageSecret() {
-        String storageSecret = StringUtils.isNotBlank(store.getKey()) ? store.getKey() : getPropertyFromEnv(JsonKey.AZURE_STORAGE_SECRET);
-        return storageSecret;
-    }
 
     public String getCloudStorageType() {
         CLOUD_STORAGE_TYPE = getCloudStorageTypeFromEnv();
@@ -160,13 +141,11 @@ public class CertsConstant {
     }
 
     public String getAzureStorageSecret() {
-        AZURE_STORAGE_SECRET = getStorageSecret();
-        return AZURE_STORAGE_SECRET;
+        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_SECRET);
     }
 
     public String getAzureStorageKey() {
-        AZURE_STORAGE_KEY = getStorageKey();
-        return AZURE_STORAGE_KEY;
+        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
     }
 
     public String getSignatoryExtensionUrl() {
@@ -198,24 +177,11 @@ public class CertsConstant {
         else return uri;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getStoragePath() {
-        STORE_PATH = this.store.getPath();
-        return STORE_PATH;
+
+    public  String getPreview(String preview) {
+        if(StringUtils.isNotBlank(preview))
+            return preview;
+        return Boolean.toString(false);
     }
 
-    /**
-     * if store params is given
-     * @param store
-     */
-    public void setCloudProperties(Map<String, Object> store) {
-        if(MapUtils.isNotEmpty(store))  {
-            String storageType = (String) store.get(JsonKey.TYPE);
-            this.store = mapper.convertValue(store.get(storageType), Store.class);
-            this.store.setType(storageType);
-        }
-    }
 }
