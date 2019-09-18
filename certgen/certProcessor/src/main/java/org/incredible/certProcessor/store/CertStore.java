@@ -29,21 +29,23 @@ public abstract class CertStore {
      * @param
      * @return
      */
-    public static Boolean checkStorageParamsExist() {
-        if(!ObjectUtils.allNotNull(store))   {
+    public static Boolean checkStorageParamsExist(Store storageParams) {
+        if (!ObjectUtils.allNotNull(storageParams)) {
             return false;
         }
         Map<String, String> properties = new HashMap<>();
         Boolean isStorageParamsExists = true;
         List<String> keys = Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.KEY);
-        if (StringUtils.isNotBlank(store.getType())) {
-            if (store.getType().equals(JsonKey.AZURE)) {
-                properties = mapper.convertValue(store.getAzureStore(), Map.class);
+        if (StringUtils.isNotBlank(storageParams.getType())) {
+            if (storageParams.getType().equals(JsonKey.AZURE)) {
+                properties = mapper.convertValue(storageParams.getAzureStore(), Map.class);
             }
-            if (store.getType().equals(JsonKey.AWS)) {
-                properties = mapper.convertValue(store.getAwsStore(), Map.class);
+            if (storageParams.getType().equals(JsonKey.AWS)) {
+                properties = mapper.convertValue(storageParams.getAwsStore(), Map.class);
             }
         }
+        if (MapUtils.isEmpty(properties))
+            return false;
         for (String key : keys) {
             if (StringUtils.isBlank(properties.get(key))) {
                 return false;
@@ -54,17 +56,12 @@ public abstract class CertStore {
 
     public static String getDirectoryName(String zipFileName, Map<String, String> properties) {
         StringBuilder sb = new StringBuilder();
-        if (CertStore.checkStorageParamsExist() || !Boolean.parseBoolean(properties.get(JsonKey.PREVIEW))) {
-            sb.append("conf/");
-            if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
-                sb.append(properties.get(JsonKey.ROOT_ORG_ID) + "_");
-            }
-            if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
-                sb.append(properties.get(JsonKey.TAG) + "_");
-            }
-        } else if (Boolean.parseBoolean(properties.get(JsonKey.PREVIEW))) {
-            //storage params are not present , save files in public folder
-            sb.append("public/");
+        sb.append("conf/");
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
+            sb.append(properties.get(JsonKey.ROOT_ORG_ID) + "_");
+        }
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
+            sb.append(properties.get(JsonKey.TAG) + "_");
         }
         String dirName = sb.toString().concat(zipFileName.concat("/"));
         logger.info("getDirectoryName: " + dirName);

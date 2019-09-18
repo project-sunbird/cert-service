@@ -66,7 +66,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
             copy(in, out, 1024);
             out.close();
             in.close();
-        } else if (CertStore.checkStorageParamsExist()) {
+        } else if (CertStore.checkStorageParamsExist(CertStore.getCloudProperties())) {
             logger.info("getZipFileFromURl: " + zipUrl + " is container based  uri");
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();

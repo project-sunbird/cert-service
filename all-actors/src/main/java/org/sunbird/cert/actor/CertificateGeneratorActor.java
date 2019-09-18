@@ -148,14 +148,14 @@ public class CertificateGeneratorActor extends BaseActor {
             , String recipientID, String directory, HashMap<String, String> properties) throws BaseException {
         Map<String, Object> resMap = new HashMap<>();
         String certFileName = certificateResponse.getUuid() + ".pdf";
-        if (CertStore.checkStorageParamsExist() && !Boolean.parseBoolean(properties.get(JsonKey.PREVIEW))) {
+        if (CertStore.checkStorageParamsExist(CertStore.getCloudProperties()) && !Boolean.parseBoolean(properties.get(JsonKey.PREVIEW))) {
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
             resMap.put(JsonKey.PDF_URL, upload(certFileName, directory, storageParams));
             certFileName = certificateResponse.getUuid() + ".json";
             resMap.put(JsonKey.JSON_URL, upload(certFileName, directory, storageParams));
             }
-        else if(!CertStore.checkStorageParamsExist() || Boolean.parseBoolean(properties.get(JsonKey.PREVIEW)))
+        else if(!CertStore.checkStorageParamsExist(CertStore.getCloudProperties()) || Boolean.parseBoolean(properties.get(JsonKey.PREVIEW)))
         {
             LocalFileStore localFileStore = new LocalFileStore(properties);
             resMap.put(JsonKey.PDF_URL, upload(certFileName, directory, localFileStore));
