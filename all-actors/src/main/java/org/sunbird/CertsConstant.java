@@ -1,9 +1,10 @@
 package org.sunbird;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.incredible.certProcessor.store.Store;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * this constant file is used to get the Constants which is used by entire actors
@@ -21,10 +22,10 @@ public class CertsConstant {
     public static final String DOWNLOAD_LINK_EXPIRY_TIMEOUT = "download_link_expiry_timeout";
     private static final String LINK_TIMEOUT = "600";
     private static final String SIGNATORY_EXTENSION = "v1/extensions/SignatoryExtension";
-    private static final String DOMAIN_URL = getDomainUrlFromEnv();
-    private static String CONTAINER_NAME;
+    private static String DOMAIN_URL = getDomainUrlFromEnv();
+    private String CONTAINER_NAME;
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
-    private static String CLOUD_STORAGE_TYPE;
+    private String CLOUD_STORAGE_TYPE;
     private static final String SLUG = getSlugFormEnv();
     private static final String DOMAIN_SLUG = DOMAIN_URL + "/" + SLUG;
 
@@ -69,7 +70,7 @@ public class CertsConstant {
     }
 
     public String getCONTAINER_NAME() {
-        CONTAINER_NAME =  getContainerNameFromEnv();
+        CONTAINER_NAME = getContainerNameFromEnv();
         return CONTAINER_NAME;
     }
 
@@ -81,7 +82,7 @@ public class CertsConstant {
     }
 
     private static String getContainerNameFromEnv() {
-        return  getPropertyFromEnv(JsonKey.CONTAINER_NAME);
+        return getPropertyFromEnv(JsonKey.CONTAINER_NAME);
     }
 
     private static String getPropertyFromEnv(String property) {
@@ -131,7 +132,7 @@ public class CertsConstant {
 
 
     private static String getCloudStorageTypeFromEnv() {
-      return   getPropertyFromEnv(JsonKey.CLOUD_STORAGE_TYPE);
+        return getPropertyFromEnv(JsonKey.CLOUD_STORAGE_TYPE);
     }
 
 
@@ -146,6 +147,14 @@ public class CertsConstant {
 
     public String getAzureStorageKey() {
         return getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
+    }
+
+    public String getAwsStorageSecret() {
+        return getPropertyFromEnv(JsonKey.AWS_STORAGE_SECRET);
+    }
+
+    public String getAwsStorageKey() {
+        return getPropertyFromEnv(JsonKey.AWS_STORAGE_KEY);
     }
 
     public String getSignatoryExtensionUrl() {
@@ -178,10 +187,42 @@ public class CertsConstant {
     }
 
 
-    public  String getPreview(String preview) {
-        if(StringUtils.isNotBlank(preview))
+    public String getPreview(String preview) {
+        if (StringUtils.isNotBlank(preview))
             return preview;
         return Boolean.toString(false);
+    }
+
+    public Map<String, Object> getStorageParamsFromEvn() {
+        logger.info("getting storage params from env");
+        String type = getCloudStorageType();
+        Map<String, Object> storeParams = new HashMap<>();
+        storeParams.put(JsonKey.TYPE, type);
+        if (StringUtils.isNotBlank(type)) {
+            if (type.equals(JsonKey.AZURE)) {
+                storeParams.put(JsonKey.AZURE, getAzureParams());
+            }
+            if (type.equals(JsonKey.AWS)) {
+                storeParams.put(JsonKey.AWS, getAwsParams());
+            }
+        }
+        return storeParams;
+    }
+
+    private Map<String, String> getAzureParams() {
+        Map<String, String> azureParams = new HashMap<>();
+        azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        azureParams.put(JsonKey.ACCOUNT, getAzureStorageKey());
+        azureParams.put(JsonKey.KEY, getAzureStorageSecret());
+        return azureParams;
+    }
+
+    private Map<String, String> getAwsParams() {
+        Map<String, String> awsParams = new HashMap<>();
+        awsParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        awsParams.put(JsonKey.ACCOUNT, getAwsStorageKey());
+        awsParams.put(JsonKey.KEY, getAwsStorageSecret());
+        return awsParams;
     }
 
 }

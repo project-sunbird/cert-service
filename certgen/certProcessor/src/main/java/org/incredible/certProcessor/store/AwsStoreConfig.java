@@ -3,7 +3,8 @@ package org.incredible.certProcessor.store;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AWSStore {
+
+public class AwsStoreConfig  {
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -15,7 +16,7 @@ public class AWSStore {
 
     private String key;
 
-    public AWSStore() {
+    public AwsStoreConfig() {
     }
 
     public String getContainerName() {
@@ -57,7 +58,6 @@ public class AWSStore {
         try {
             stringRep = mapper.writeValueAsString(this);
         } catch (JsonProcessingException jpe) {
-            jpe.printStackTrace();
         }
         return stringRep;
     }

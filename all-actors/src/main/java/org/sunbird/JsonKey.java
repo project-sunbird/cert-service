@@ -100,4 +100,7 @@ public interface JsonKey {
     String PREVIEW="preview";
     String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
     String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
+    String VERIFY_CERT = "verifyCert";
+    String AZURE = "azure";
+    String AWS = "aws";
 }

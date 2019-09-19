@@ -1,63 +1,57 @@
 package org.incredible.certProcessor.store;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AzureStore {
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.sunbird.cloud.storage.BaseStorageService;
+import org.sunbird.cloud.storage.factory.StorageConfig;
+import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
-    private ObjectMapper mapper = new ObjectMapper();
 
-    private String containerName;
+import java.io.File;
 
-    private String path;
+public class AzureStore extends CloudStore {
 
-    private String account;
+    private Logger logger = Logger.getLogger(AzureStore.class);
 
-    private String key;
+    private StoreConfig azureStoreConfig;
 
-    public AzureStore() {
-    }
+    private BaseStorageService storageService = null;
 
-    public String getContainerName() {
-        return containerName;
-    }
-
-    public void setContainerName(String containerName) {
-        this.containerName = containerName;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public AzureStore(StoreConfig azureStoreConfig) {
+        this.azureStoreConfig = azureStoreConfig;
     }
 
     @Override
-    public String toString() {
-        String stringRep = null;
-        try {
-            stringRep = mapper.writeValueAsString(this);
-        } catch (JsonProcessingException jpe) {
-            jpe.printStackTrace();
+    public String upload(File file, String path) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(path);
+        if (StringUtils.isNotBlank(azureStoreConfig.getAzureStoreConfig().getPath())) {
+            stringBuilder.append(azureStoreConfig.getAzureStoreConfig().getPath());
         }
-        return stringRep;
+        CloudStorage cloudStorage = new CloudStorage(storageService);
+        int retryCount = Integer.parseInt(azureStoreConfig.getCloudRetryCount());
+        return cloudStorage.uploadFile(azureStoreConfig.getAzureStoreConfig().getContainerName(), stringBuilder.toString(), file, false, retryCount);
+    }
+
+    @Override
+    public void download(String fileName, String localPath) {
+        CloudStorage cloudStorage = new CloudStorage(storageService);
+        cloudStorage.downloadFile(azureStoreConfig.getAzureStoreConfig().getContainerName(), fileName, localPath, false);
+    }
+
+    @Override
+    public void init() {
+        if (StringUtils.isNotBlank(azureStoreConfig.getType())) {
+            String storageKey = azureStoreConfig.getAzureStoreConfig().getAccount();
+            String storageSecret = azureStoreConfig.getAzureStoreConfig().getKey();
+            StorageConfig storageConfig = new StorageConfig(azureStoreConfig.getType(), storageKey, storageSecret);
+            logger.info("StorageParams:init:all storage params initialized for azure block");
+            storageService = StorageServiceFactory.getStorageService(storageConfig);
+        } else {
+            logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(azureStoreConfig.getType()));
+        }
+
     }
 }
+

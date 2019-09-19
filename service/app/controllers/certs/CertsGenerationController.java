@@ -31,12 +31,18 @@ public class CertsGenerationController  extends BaseController{
 				CertActorOperation.GENERATE_CERTIFICATE.getOperation());
 	    return response;
 	  }
-	
+
 	  public CompletionStage<Result> generateSignUrl() {
 			CompletionStage<Result> response = handleRequest(request(),
 					null,
 					CertActorOperation.GET_SIGN_URL.getOperation());
 		    return response;
-		  }  
+		  }
 
+		  public CompletionStage<Result> verifyCertificate() {
+		CompletionStage<Result> response = handleRequest(request(),
+				null,
+				CertActorOperation.VERIFY_CERTIFICATE.getOperation());
+		return response;
+	}
 }
