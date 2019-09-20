@@ -33,6 +33,6 @@ public class CloudStorage {
 
     public void downloadFile(String container, String fileName, String localPath, boolean isDirectory) {
         storageService.download(container, fileName, localPath, Option.apply(isDirectory));
-        logger.info(fileName + "downloaded");
+        logger.info(fileName + " downloaded successfully");
     }
 }

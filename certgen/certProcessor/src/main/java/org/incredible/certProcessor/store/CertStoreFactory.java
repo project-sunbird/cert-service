@@ -24,13 +24,22 @@ public class CertStoreFactory {
 
     private Map<String, String> properties;
 
-    private String containerName;
-
 
     public CertStoreFactory(Map<String, String> properties) {
         this.properties = properties;
     }
 
+    /**
+     * templateUrl could be local and/or relative or http URL
+     * RELATIVE: If storageParams exist and url doesn't start with http, it is relative to container.
+     * ABSOLUTE: a)If storageParams exist and url starts with http,then it is httpURL (private, container only)
+     * b)if storageParams does not exits, then it is httpURL (public).
+     * LOCAL- If storageParams doesn't exist, and  url is always relative and then template is in local
+     *
+     * @param templateUrl
+     * @param storeConfig storage params
+     * @return
+     */
     public ICertStore getHtmlTemplateStore(String templateUrl, StoreConfig storeConfig) {
         ICertStore certStore = null;
         if (templateUrl.startsWith("http")) {
@@ -45,7 +54,16 @@ public class CertStoreFactory {
         return certStore;
     }
 
-
+    /**
+     * used to know whether certificate files should be stored in local or cloud
+     * Scenario 1)If storage params exits then it is cloud storage
+     * Scenario 2)If preview is true (even If storage params exists it not cloud store),then it always local store
+     * Scenario 3)If storage params doest not exits , then it is local store
+     *
+     * @param storeConfig
+     * @param preview
+     * @return
+     */
     public ICertStore getCertStore(StoreConfig storeConfig, String preview) {
         if (BooleanUtils.toBoolean(preview)) {
             return new LocalStore();
@@ -57,6 +75,12 @@ public class CertStoreFactory {
         }
     }
 
+    /**
+     * used to clean up files
+     *
+     * @param fileName
+     * @param path
+     */
     public void cleanUp(String fileName, String path) {
         Boolean isDeleted = false;
         try {
@@ -64,7 +88,7 @@ public class CertStoreFactory {
                 File directory = new File(path);
                 File[] files = directory.listFiles((FileFilter) new PrefixFileFilter(fileName));
                 for (File file : files) {
-                        isDeleted = file.delete();
+                    isDeleted = file.delete();
                 }
                 logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
             }
@@ -73,6 +97,13 @@ public class CertStoreFactory {
         }
     }
 
+    /**
+     * returns directory name to store all the certificate related files
+     *
+     * @param zipFileName
+     * @param properties
+     * @return
+     */
     public String getDirectoryName(String zipFileName, Map<String, String> properties) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("conf/");
@@ -86,6 +117,12 @@ public class CertStoreFactory {
         return dirName;
     }
 
+    /**
+     * Checks all storage params(container name , account, key) exists or not
+     *
+     * @param storageParams
+     * @return boolean value
+     */
     public Boolean checkStorageParamsExist(StoreConfig storageParams) {
         Map<String, String> properties = new HashMap<>();
         List<String> keys = Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.KEY);
@@ -106,7 +143,11 @@ public class CertStoreFactory {
         return true;
     }
 
-
+    /**
+     * maps store params request to StoreConfig
+     * @param storeParams
+     * @return
+     */
     public StoreConfig setCloudProperties(Map<String, Object> storeParams) {
         StoreConfig storeConfig = new StoreConfig();
         storeConfig.setType((String) storeParams.get(JsonKey.TYPE));
@@ -120,6 +161,11 @@ public class CertStoreFactory {
         return storeConfig;
     }
 
+    /**
+     * to know whether cloud store is azure or aws
+     * @param storeConfig
+     * @return instance of azureStore or awsStore
+     */
     private CloudStore getCloudStore(StoreConfig storeConfig) {
         CloudStore cloudStore = null;
         if (storeConfig.getType().equals(JsonKey.AZURE)) {

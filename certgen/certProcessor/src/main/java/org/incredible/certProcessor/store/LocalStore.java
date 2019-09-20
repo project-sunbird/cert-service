@@ -34,7 +34,7 @@ public class LocalStore implements ICertStore {
         copy(inputStream, out, 1024);
         out.close();
         inputStream.close();
-        logger.info(fileName + "downloaded");
+        logger.info(fileName + " downloaded successfully");
     }
 
     @Override

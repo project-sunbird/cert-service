@@ -130,6 +130,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
         htmlTemplateStore.init();
         htmlTemplateStore.get(zipUrl, zipFileName);
         unzip("conf/" + zipFileName, targetDirectory);
+        readIndexHtmlFile(targetDirectory);
     }
 
     /**
