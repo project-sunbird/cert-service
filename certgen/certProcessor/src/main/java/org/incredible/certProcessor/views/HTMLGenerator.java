@@ -79,8 +79,7 @@ public class HTMLGenerator {
     private void createHTMLFile(VelocityContext context, String certUuid, String directory) {
         try {
             File file = new File(directory, certUuid + ".html");
-//            Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-            Writer writer = new FileWriter(file);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
             Velocity.evaluate(context, writer, "velocity", htmlString);
             writer.flush();
             writer.close();

@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -121,7 +122,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
             unzip("conf/" + getZipFileName(), absolutePath);
         }
         FileInputStream fis = new FileInputStream(absolutePath + htmlFileName);
-        content = IOUtils.toString(fis, "UTF-8");
+        content = IOUtils.toString(fis,  StandardCharsets.UTF_8);
         fis.close();
 
     }

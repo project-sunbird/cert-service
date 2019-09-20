@@ -97,7 +97,7 @@ public class CertMapper {
         List<String> validatedPublicKeys = new ArrayList<>();
         publicKeys.forEach((publicKey) -> {
             if (!publicKey.startsWith("http")) {
-                if (null == rootOrgId || (rootOrgId != null && rootOrgId.isEmpty()))
+                if (StringUtils.isBlank(rootOrgId))
                     validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + publicKey.concat("_publicKey.json"));
                 else
                     validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + rootOrgId.concat("/") + publicKey.concat("_publicKey.json"));

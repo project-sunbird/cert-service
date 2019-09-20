@@ -3,18 +3,21 @@ package org.incredible.certProcessor.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class CertStoreFactory {
 
@@ -43,7 +46,7 @@ public class CertStoreFactory {
     public ICertStore getHtmlTemplateStore(String templateUrl, StoreConfig storeConfig) {
         ICertStore certStore = null;
         if (templateUrl.startsWith("http")) {
-            if (StringUtils.isNotBlank(properties.get(JsonKey.containerName)) && (templateUrl.contains(properties.get(JsonKey.containerName)) && checkStorageParamsExist(storeConfig))) {
+            if (StringUtils.isNotBlank(properties.get(JsonKey.containerName)) && templateUrl.contains(properties.get(JsonKey.containerName)) && checkStorageParamsExist(storeConfig)) {
                 certStore = getCloudStore(storeConfig);
             } else {
                 certStore = new LocalStore();
@@ -86,8 +89,10 @@ public class CertStoreFactory {
         try {
             if (StringUtils.isNotBlank(fileName)) {
                 File directory = new File(path);
-                File[] files = directory.listFiles((FileFilter) new PrefixFileFilter(fileName));
-                for (File file : files) {
+                Collection<File> files = FileUtils.listFiles(directory, new WildcardFileFilter(fileName + ".*"), null);
+                Iterator iterator = files.iterator();
+                while (iterator.hasNext()) {
+                    File file = (File) iterator.next();
                     isDeleted = file.delete();
                 }
                 logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
@@ -125,10 +130,13 @@ public class CertStoreFactory {
     public Boolean checkStorageParamsExist(StoreConfig storageParams) {
         Map<String, String> properties = new HashMap<>();
         List<String> keys = Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.KEY);
-        if (storageParams.getType().equals(JsonKey.AZURE)) {
+        if (Objects.isNull(storageParams)) {
+            return false;
+        }
+        if (JsonKey.AZURE.equals(storageParams.getType())) {
             properties = mapper.convertValue(storageParams.getAzureStoreConfig(), Map.class);
         }
-        if (storageParams.getType().equals(JsonKey.AWS)) {
+        if ((JsonKey.AWS).equals(storageParams.getType())) {
             properties = mapper.convertValue(storageParams.getAwsStoreConfig(), Map.class);
         }
         if (MapUtils.isEmpty(properties)) {
@@ -154,7 +162,7 @@ public class CertStoreFactory {
         if (storeParams.containsKey(JsonKey.AZURE)) {
             AzureStoreConfig azureStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AZURE), AzureStoreConfig.class);
             storeConfig.setAzureStoreConfig(azureStoreConfig);
-        } else if (storeParams.containsKey((JsonKey.TYPE))) {
+        } else if (storeParams.containsKey(JsonKey.TYPE)) {
             AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
             storeConfig.setAwsStoreConfig(awsStoreConfig);
         }

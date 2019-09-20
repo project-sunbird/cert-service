@@ -139,15 +139,15 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("onReceive method call End");
     }
 
-    private Map<String, Object> uploadCertificate(CertificateResponse certificateResponse, String directory, ICertStore store, HashMap<String, String> properties) throws Exception {
-        store.init();
+    private Map<String, Object> uploadCertificate(CertificateResponse certificateResponse, String directory, ICertStore certStore, HashMap<String, String> properties) throws BaseException, IOException {
+        certStore.init();
         Map<String, Object> resMap = new HashMap<>();
         String certFileName = certificateResponse.getUuid() + ".pdf";
         File file = FileUtils.getFile(directory + certFileName);
-        resMap.put(JsonKey.PDF_URL, store.save(file, properties));
+        resMap.put(JsonKey.PDF_URL, certStore.save(file, properties));
         certFileName = certificateResponse.getUuid() + ".json";
         file = FileUtils.getFile(directory, certFileName);
-        resMap.put(JsonKey.JSON_URL, store.save(file, properties));
+        resMap.put(JsonKey.JSON_URL, certStore.save(file, properties));
         resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
         resMap.put(JsonKey.RECIPIENT_ID, certificateResponse.getRecipientId());
         resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());

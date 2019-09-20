@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface ICertStore {
 
-    String save(File file, Map<String, String> properties) throws Exception;
+    String save(File file, Map<String, String> properties) throws IOException;
 
     void get(String url, String fileName) throws IOException;
 

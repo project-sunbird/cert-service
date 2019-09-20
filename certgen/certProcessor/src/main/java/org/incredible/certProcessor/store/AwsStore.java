@@ -45,7 +45,7 @@ public class AwsStore extends CloudStore {
             String storageKey = awsStoreConfig.getAwsStoreConfig().getAccount();
             String storageSecret = awsStoreConfig.getAwsStoreConfig().getKey();
             StorageConfig storageConfig = new StorageConfig(awsStoreConfig.getType(), storageKey, storageSecret);
-            logger.info("StorageParams:init:all storage params initialized for azure block");
+            logger.info("StorageParams:init:all storage params initialized for aws block");
             storageService = StorageServiceFactory.getStorageService(storageConfig);
         } else {
             logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(awsStoreConfig.getType()));
