@@ -7,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
-import org.incredible.certProcessor.store.*;
+import org.incredible.certProcessor.store.CertStoreFactory;
+import org.incredible.certProcessor.store.ICertStore;
+import org.incredible.certProcessor.store.StoreConfig;
 import org.incredible.certProcessor.views.HTMLTemplateZip;
 import org.incredible.pojos.CertificateResponse;
 import org.sunbird.BaseActor;
@@ -29,7 +31,11 @@ import scala.Some;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This actor is responsible for certificate generation.
@@ -37,7 +43,7 @@ import java.util.*;
  * @author manzarul
  */
 @ActorConfig(
-        tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL, JsonKey.VERIFY_CERT},
+        tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL},
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {

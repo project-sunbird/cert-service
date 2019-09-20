@@ -113,8 +113,7 @@ public class CertStoreFactory {
         if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
             stringBuilder.append(properties.get(JsonKey.TAG) + "_");
         }
-        String dirName = stringBuilder.toString().concat(zipFileName.concat("/"));
-        return dirName;
+        return stringBuilder.toString().concat(zipFileName.concat("/"));
     }
 
     /**
@@ -145,6 +144,7 @@ public class CertStoreFactory {
 
     /**
      * maps store params request to StoreConfig
+     *
      * @param storeParams
      * @return
      */
@@ -163,6 +163,7 @@ public class CertStoreFactory {
 
     /**
      * to know whether cloud store is azure or aws
+     *
      * @param storeConfig
      * @return instance of azureStore or awsStore
      */
