@@ -12,25 +12,30 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 
 public class LocalStore implements ICertStore {
 
     private Logger logger = Logger.getLogger(LocalStore.class);
 
+    private String domainUrl;
+
+    public LocalStore(String domainUrl) {
+        this.domainUrl = domainUrl;
+    }
+
     @Override
-    public String save(File file, Map<String, String> properties) throws IOException {
-        FileUtils.copyFileToDirectory(file, new File("public/"));
-        return properties.get(JsonKey.DOMAIN_URL) + "/" + JsonKey.ASSETS + "/" + file.getName();
+    public String save(File file, String path) throws IOException {
+        FileUtils.copyFileToDirectory(file, new File(path));
+        return domainUrl + "/" + JsonKey.ASSETS + "/" + file.getName();
     }
 
 
     @Override
-    public void get(String url, String fileName) throws IOException {
+    public void get(String url, String fileName, String localPath) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod(HttpMethod.GET);
         InputStream inputStream = connection.getInputStream();
-        FileOutputStream out = new FileOutputStream("conf/" + fileName);
+        FileOutputStream out = new FileOutputStream(localPath + fileName);
         copy(inputStream, out, 1024);
         out.close();
         inputStream.close();

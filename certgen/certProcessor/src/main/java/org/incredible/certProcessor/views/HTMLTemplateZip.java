@@ -122,14 +122,14 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
             unzip("conf/" + getZipFileName(), absolutePath);
         }
         FileInputStream fis = new FileInputStream(absolutePath + htmlFileName);
-        content = IOUtils.toString(fis,  StandardCharsets.UTF_8);
+        content = IOUtils.toString(fis, StandardCharsets.UTF_8);
         fis.close();
 
     }
 
     private void download(String zipFileName, String targetDirectory) throws IOException {
         htmlTemplateStore.init();
-        htmlTemplateStore.get(zipUrl, zipFileName);
+        htmlTemplateStore.get(zipUrl, zipFileName, "conf/");
         unzip("conf/" + zipFileName, targetDirectory);
         readIndexHtmlFile(targetDirectory);
     }

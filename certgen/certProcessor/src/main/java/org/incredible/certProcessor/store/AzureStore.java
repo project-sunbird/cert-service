@@ -27,7 +27,7 @@ public class AzureStore extends CloudStore {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(path);
         if (StringUtils.isNotBlank(azureStoreConfig.getAzureStoreConfig().getPath())) {
-            stringBuilder.append(azureStoreConfig.getAzureStoreConfig().getPath());
+            stringBuilder.append(azureStoreConfig.getAzureStoreConfig().getPath() + "/");
         }
         CloudStorage cloudStorage = new CloudStorage(storageService);
         int retryCount = Integer.parseInt(azureStoreConfig.getCloudRetryCount());

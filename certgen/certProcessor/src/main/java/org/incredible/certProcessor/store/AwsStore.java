@@ -14,7 +14,7 @@ public class AwsStore extends CloudStore {
 
     private Logger logger = Logger.getLogger(AwsStore.class);
 
-    private  BaseStorageService storageService = null;
+    private BaseStorageService storageService = null;
 
     public AwsStore(StoreConfig awsStoreConfig) {
         this.awsStoreConfig = awsStoreConfig;
@@ -26,7 +26,7 @@ public class AwsStore extends CloudStore {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(path);
         if (StringUtils.isNotBlank(awsStoreConfig.getAwsStoreConfig().getPath())) {
-            stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath());
+            stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath() + "/");
         }
         CloudStorage cloudStorage = new CloudStorage(storageService);
         int retryCount = Integer.parseInt(awsStoreConfig.getCloudRetryCount());

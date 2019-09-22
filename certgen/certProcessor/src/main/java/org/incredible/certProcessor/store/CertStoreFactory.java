@@ -1,8 +1,6 @@
 package org.incredible.certProcessor.store;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.BooleanUtils;
@@ -11,17 +9,12 @@ import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class CertStoreFactory {
 
-    private static ObjectMapper mapper = new ObjectMapper();
 
     private static Logger logger = Logger.getLogger(CertStoreFactory.class);
 
@@ -46,12 +39,14 @@ public class CertStoreFactory {
     public ICertStore getHtmlTemplateStore(String templateUrl, StoreConfig storeConfig) {
         ICertStore certStore = null;
         if (templateUrl.startsWith("http")) {
-            if (StringUtils.isNotBlank(properties.get(JsonKey.containerName)) && templateUrl.contains(properties.get(JsonKey.containerName)) && checkStorageParamsExist(storeConfig)) {
+            if (StringUtils.isNotBlank(storeConfig.getContainerName()) &&
+                    templateUrl.contains(storeConfig.getContainerName()) &&
+                    storeConfig.isCloudStore()) {
                 certStore = getCloudStore(storeConfig);
             } else {
-                certStore = new LocalStore();
+                certStore = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
             }
-        } else if (checkStorageParamsExist(storeConfig)) {
+        } else if (storeConfig.isCloudStore()) {
             certStore = getCloudStore(storeConfig);
         }
         return certStore;
@@ -68,18 +63,19 @@ public class CertStoreFactory {
      * @return
      */
     public ICertStore getCertStore(StoreConfig storeConfig, String preview) {
+        ICertStore store = null;
         if (BooleanUtils.toBoolean(preview)) {
-            return new LocalStore();
-        }
-        if (checkStorageParamsExist(storeConfig)) {
-            return getCloudStore(storeConfig);
+            store = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
+        } else if (storeConfig.isCloudStore()) {
+            store = getCloudStore(storeConfig);
         } else {
-            return new LocalStore();
+            store = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
         }
+        return store;
     }
 
     /**
-     * used to clean up files
+     * used to clean up files start with uuid
      *
      * @param fileName
      * @param path
@@ -106,10 +102,9 @@ public class CertStoreFactory {
      * returns directory name to store all the certificate related files
      *
      * @param zipFileName
-     * @param properties
      * @return
      */
-    public String getDirectoryName(String zipFileName, Map<String, String> properties) {
+    public String getDirectoryName(String zipFileName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("conf/");
         if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
@@ -119,54 +114,6 @@ public class CertStoreFactory {
             stringBuilder.append(properties.get(JsonKey.TAG) + "_");
         }
         return stringBuilder.toString().concat(zipFileName.concat("/"));
-    }
-
-    /**
-     * Checks all storage params(container name , account, key) exists or not
-     *
-     * @param storageParams
-     * @return boolean value
-     */
-    public Boolean checkStorageParamsExist(StoreConfig storageParams) {
-        Map<String, String> properties = new HashMap<>();
-        List<String> keys = Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.KEY);
-        if (Objects.isNull(storageParams)) {
-            return false;
-        }
-        if (JsonKey.AZURE.equals(storageParams.getType())) {
-            properties = mapper.convertValue(storageParams.getAzureStoreConfig(), Map.class);
-        }
-        if ((JsonKey.AWS).equals(storageParams.getType())) {
-            properties = mapper.convertValue(storageParams.getAwsStoreConfig(), Map.class);
-        }
-        if (MapUtils.isEmpty(properties)) {
-            return false;
-        }
-        for (String key : keys) {
-            if (StringUtils.isBlank(properties.get(key))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * maps store params request to StoreConfig
-     *
-     * @param storeParams
-     * @return
-     */
-    public StoreConfig setCloudProperties(Map<String, Object> storeParams) {
-        StoreConfig storeConfig = new StoreConfig();
-        storeConfig.setType((String) storeParams.get(JsonKey.TYPE));
-        if (storeParams.containsKey(JsonKey.AZURE)) {
-            AzureStoreConfig azureStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AZURE), AzureStoreConfig.class);
-            storeConfig.setAzureStoreConfig(azureStoreConfig);
-        } else if (storeParams.containsKey(JsonKey.TYPE)) {
-            AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
-            storeConfig.setAwsStoreConfig(awsStoreConfig);
-        }
-        return storeConfig;
     }
 
     /**
@@ -184,6 +131,28 @@ public class CertStoreFactory {
         }
         return cloudStore;
     }
+
+    public String setCloudPath(StoreConfig storeConfig) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW))) {
+            stringBuilder.append("public/").toString();
+        } else if (storeConfig.isCloudStore()) {
+            String orgId = properties.get(org.incredible.certProcessor.JsonKey.ROOT_ORG_ID);
+            String batchId = properties.get(org.incredible.certProcessor.JsonKey.TAG);
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(orgId)) {
+                stringBuilder.append(orgId).append("/");
+            }
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(batchId)) {
+                stringBuilder.append(batchId).append("/");
+            }
+            stringBuilder.toString();
+        } else {
+            stringBuilder.append("public/").toString();
+
+        }
+        return stringBuilder.toString();
+    }
+
 
 }
 

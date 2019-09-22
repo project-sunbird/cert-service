@@ -2,6 +2,9 @@ package org.incredible.certProcessor.store;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.incredible.certProcessor.JsonKey;
+
+import java.util.Map;
 
 public class StoreConfig {
 
@@ -15,7 +18,32 @@ public class StoreConfig {
 
     private AwsStoreConfig awsStoreConfig;
 
-    public StoreConfig() {
+    private StoreConfig() {
+    }
+
+    public StoreConfig(Map<String, Object> storeParams) {
+        setType((String) storeParams.get(JsonKey.TYPE));
+        if (storeParams.containsKey(JsonKey.AZURE)) {
+            AzureStoreConfig azureStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AZURE), AzureStoreConfig.class);
+            setAzureStoreConfig(azureStoreConfig);
+        } else if (storeParams.containsKey(JsonKey.TYPE)) {
+            AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
+            setAwsStoreConfig(awsStoreConfig);
+        }
+    }
+
+    public boolean isCloudStore() {
+        return (azureStoreConfig != null || awsStoreConfig != null);
+    }
+
+    public String getContainerName() {
+        String containerName = null;
+        if (JsonKey.AZURE.equals(getType())) {
+            containerName = azureStoreConfig.getContainerName();
+        } else if (JsonKey.AWS.equals(getType())) {
+            containerName = awsStoreConfig.getContainerName();
+        }
+        return containerName;
     }
 
     public String getType() {
