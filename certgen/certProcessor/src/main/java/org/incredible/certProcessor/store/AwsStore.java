@@ -8,6 +8,9 @@ import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
 
+/**
+ * used to upload or downloads files to aws
+ */
 public class AwsStore extends CloudStore {
 
     private StoreConfig awsStoreConfig;

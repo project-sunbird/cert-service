@@ -15,7 +15,6 @@ public class AccessCodeGenerator {
     private String regex = "[A-Z][0-9][A-Z][0-9][A-Z][0-9]";
     private Pattern pattern = Pattern.compile(regex);
 
-//variable that are static and final should be caps
     private static final String[] ALPHABET = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C",
             "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
             "Z"};

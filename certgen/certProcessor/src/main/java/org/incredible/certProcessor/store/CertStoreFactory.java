@@ -75,7 +75,7 @@ public class CertStoreFactory {
     }
 
     /**
-     * used to clean up files start with uuid
+     * used to clean up files which start with uuid.*
      *
      * @param fileName
      * @param path
@@ -132,6 +132,11 @@ public class CertStoreFactory {
         return cloudStore;
     }
 
+    /**
+     * set the path for file to store cloud or path to store in local
+     * @param storeConfig
+     * @return
+     */
     public String setCloudPath(StoreConfig storeConfig) {
         StringBuilder stringBuilder = new StringBuilder();
         if (BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW))) {
@@ -145,7 +150,6 @@ public class CertStoreFactory {
             if (org.apache.commons.lang3.StringUtils.isNotEmpty(batchId)) {
                 stringBuilder.append(batchId).append("/");
             }
-            stringBuilder.toString();
         } else {
             stringBuilder.append("public/").toString();
 
