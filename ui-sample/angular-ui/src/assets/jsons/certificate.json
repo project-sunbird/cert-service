@@ -141,23 +141,6 @@
                     "semanticColumnWidth": "six"
                 },
                 "index": 8
-            },
-            {
-                "code": "htmlTemplateUrl",
-                "dataType": "text",
-                "name": "htmlTemplateUrl",
-                "label": "HTML Template URL",
-                "description": "HTML Template URL",
-                "editable": true,
-                "placeholder": "HTML Template URL",
-                "inputType": "text",
-                "required": true,
-                "displayProperty": "Editable",
-                "visible": true,
-                "renderingHints": {
-                    "semanticColumnWidth": "twelve"
-                },
-                "index": 9
             }
         ]
     }
