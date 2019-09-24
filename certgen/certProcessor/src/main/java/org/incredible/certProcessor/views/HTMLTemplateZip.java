@@ -33,6 +33,8 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
 
     private ICertStore htmlTemplateStore;
 
+    private String zipFilePath = "conf/";
+
     public HTMLTemplateZip(ICertStore htmlTemplateStore, String zipUrl) {
         this.htmlTemplateStore = htmlTemplateStore;
         this.zipUrl = zipUrl;
@@ -119,7 +121,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
     private void readIndexHtmlFile(String absolutePath) throws IOException {
         String htmlFileName = "/index.html";
         if (!isFileExists(new File(absolutePath + htmlFileName))) {
-            unzip("conf/" + getZipFileName(), absolutePath);
+            unzip(zipFilePath + getZipFileName(), absolutePath);
         }
         FileInputStream fis = new FileInputStream(absolutePath + htmlFileName);
         content = IOUtils.toString(fis, StandardCharsets.UTF_8);
@@ -127,11 +129,10 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
 
     }
 
-    private void download(String zipFileName, String targetDirectory) throws IOException {
+    private void downloadAndUnzip(String zipFileName, String targetDirectory) throws IOException {
         htmlTemplateStore.init();
-        htmlTemplateStore.get(zipUrl, zipFileName, "conf/");
-        unzip("conf/" + zipFileName, targetDirectory);
-        readIndexHtmlFile(targetDirectory);
+        htmlTemplateStore.get(zipUrl, zipFileName, zipFilePath);
+        unzip(zipFilePath + zipFileName, targetDirectory);
     }
 
     /**
@@ -144,10 +145,11 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
         String zipFileName = getZipFileName();
         if (content == null) {
             File targetDirectory = new File(filePath);
-            if (isFileExists(new File("conf/" + zipFileName))) {
+            if (isFileExists(new File(zipFilePath + zipFileName))) {
                 readIndexHtmlFile(targetDirectory.getAbsolutePath());
             } else {
-                download(zipFileName, targetDirectory.getAbsolutePath());
+                downloadAndUnzip(zipFileName, targetDirectory.getAbsolutePath());
+                readIndexHtmlFile(targetDirectory.getAbsolutePath());
             }
         }
         return content;
