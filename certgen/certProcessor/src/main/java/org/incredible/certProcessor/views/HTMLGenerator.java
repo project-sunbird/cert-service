@@ -62,7 +62,7 @@ public class HTMLGenerator {
                 logger.info("exception while generating html for certificate {}", e.getMessage());
             }
         }
-        createHTMLFile(context, getUUID(certificateExtension.getId()), directory);
+        createHTMLFile(context, directory + getUUID(certificateExtension.getId()));
     }
 
     private String getUUID(String certId) {
@@ -76,15 +76,14 @@ public class HTMLGenerator {
         }
     }
 
-    private void createHTMLFile(VelocityContext context, String certUuid, String directory) {
+    private void createHTMLFile(VelocityContext context, String fileName)  {
         try {
-            File file = new File(directory, certUuid + ".html");
+            File file = new File(fileName + ".html");
             Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
             Velocity.evaluate(context, writer, "velocity", htmlString);
             writer.flush();
             writer.close();
             logger.info("html file is created {}", file.getName());
-            PdfConverter.convertor(file, certUuid, directory);
         } catch (IOException e) {
             logger.error("IO exception while creating html file :{}", e.getMessage());
         }

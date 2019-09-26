@@ -38,6 +38,7 @@ public interface JsonKey {
     String KEY="key";
     String ACCOUNT = "account";
     String containerName = "containerName";
+    String SIGN_PDF = "signPdf";
 
 
 

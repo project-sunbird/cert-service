@@ -48,6 +48,8 @@ public class CertStoreFactory {
             }
         } else if (storeConfig.isCloudStore()) {
             certStore = getCloudStore(storeConfig);
+        } else {
+            certStore = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
         }
         return certStore;
     }

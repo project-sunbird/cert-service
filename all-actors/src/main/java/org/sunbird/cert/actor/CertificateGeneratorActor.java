@@ -174,6 +174,7 @@ public class CertificateGeneratorActor extends BaseActor {
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
         String preview = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.PREVIEW);
+        String signPdf = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.SIGN_PDF);
         Map<String, Object> keysObject = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS);
         if (MapUtils.isNotEmpty(keysObject)) {
             String keyId = (String) keysObject.get(JsonKey.ID);
@@ -197,6 +198,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
         properties.put(JsonKey.SLUG, certVar.getSlug());
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
+        properties.put(JsonKey.SIGN_PDF, certVar.getSignPdf(signPdf));
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;

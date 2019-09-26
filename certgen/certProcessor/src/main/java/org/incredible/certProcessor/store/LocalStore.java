@@ -32,14 +32,18 @@ public class LocalStore implements ICertStore {
 
     @Override
     public void get(String url, String fileName, String localPath) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setRequestMethod(HttpMethod.GET);
-        InputStream inputStream = connection.getInputStream();
-        FileOutputStream out = new FileOutputStream(localPath + fileName);
-        copy(inputStream, out, 1024);
-        out.close();
-        inputStream.close();
-        logger.info(fileName + " downloaded successfully");
+        if (url.startsWith("http")) {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod(HttpMethod.GET);
+            InputStream inputStream = connection.getInputStream();
+            FileOutputStream out = new FileOutputStream(localPath + fileName);
+            copy(inputStream, out, 1024);
+            out.close();
+            inputStream.close();
+            logger.info(fileName + " downloaded successfully");
+        } else {
+            throw new IOException("given template is not a valid, please provide a valid template");
+        }
     }
 
     @Override

@@ -193,6 +193,12 @@ public class CertsConstant {
         return Boolean.toString(false);
     }
 
+    public String getSignPdf(String signPdf) {
+        if (StringUtils.isNotBlank(signPdf))
+            return signPdf;
+        return Boolean.toString(false);
+    }
+
     public Map<String, Object> getStorageParamsFromEvn() {
         logger.info("getting storage params from env");
         String type = getCloudStorageType();
