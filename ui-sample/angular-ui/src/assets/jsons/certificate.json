@@ -138,7 +138,7 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"https://gcert.gujarat.gov.in/gcert/",
+                "value":"http://diksha.gov.in",
                 "renderingHints": {
                     "semanticColumnWidth": "six"
                 },

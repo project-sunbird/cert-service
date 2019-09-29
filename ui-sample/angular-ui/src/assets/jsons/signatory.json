@@ -17,7 +17,7 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
-                "value":"CEO Gujarat",
+                "value":"CEO",
                 "renderingHints": {
                     "semanticColumnWidth": "three"
                 },
