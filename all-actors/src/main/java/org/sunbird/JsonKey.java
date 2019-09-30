@@ -98,6 +98,7 @@ public interface JsonKey {
     String key = "key";
     String ASSETS = "assets";
     String PREVIEW="preview";
+    String SIGN_PDF = "signPdf";
     String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
     String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
     String VERIFY_CERT = "verifyCert";

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
+import com.itextpdf.text.DocumentException;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
@@ -13,6 +15,8 @@ import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.views.HTMLGenerator;
 import org.incredible.certProcessor.views.HTMLTemplateProvider;
+import org.incredible.certProcessor.views.PdfConverter;
+import org.incredible.certProcessor.views.PdfSignature;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.CertificateResponse;
 import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
@@ -25,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 /**
@@ -51,7 +56,7 @@ public class CertificateGenerator {
 
     public CertificateResponse createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider) throws
             SignatureException.UnreachableException, InvalidDateFormatException, SignatureException.CreationException,
-            IOException, FontFormatException, NotFoundException, WriterException {
+            IOException, FontFormatException, NotFoundException, WriterException, DocumentException, GeneralSecurityException {
         String uuid;
         CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
         String jsonData = generateCertificateJson(certificateExtension);
@@ -61,6 +66,7 @@ public class CertificateGenerator {
             HTMLGenerator htmlGenerator = new HTMLGenerator(htmlContent);
             htmlGenerator.generate(certificateExtension, directory);
             uuid = getUUID(certificateExtension.getId());
+            generatePdf(uuid);
         } else {
             return new CertificateResponse();
         }
@@ -77,6 +83,17 @@ public class CertificateGenerator {
             return null;
         }
         return StringUtils.substringBefore(idStr, ".");
+    }
+
+    private void generatePdf(String uuid) throws IOException, GeneralSecurityException, DocumentException {
+        PdfConverter pdfConverter = new PdfConverter();
+        if (BooleanUtils.toBoolean(properties.get(JsonKey.SIGN_PDF))) {
+            PdfSignature pdfSignature = new PdfSignature();
+            pdfConverter.converter(new File(directory + uuid + ".html"), directory + uuid + "unsigned.pdf");
+            pdfSignature.sign(directory.concat(uuid + "unsigned.pdf"), directory.concat(uuid + ".pdf"));
+        } else {
+            pdfConverter.converter(new File(directory + uuid + ".html"), directory.concat(uuid + ".pdf"));
+        }
     }
 
     private String generateCertificateJson(CertificateExtension certificateExtension) {
