@@ -1,9 +1,8 @@
-import { Component, Input, OnInit, AfterViewInit, Output, EventEmitter, AfterViewChecked, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router'
 import { DataService } from '../../services/data/data.service';
 import urlConfig from '../../services/urlConfig.json';
 import * as _ from 'lodash-es';
-import { filter } from 'rxjs/operators';
 
 
 @Component({
@@ -11,10 +10,9 @@ import { filter } from 'rxjs/operators';
   templateUrl: './default-template.component.html',
   styleUrls: ['./default-template.component.scss']
 })
-export class DefaultTemplateComponent implements OnInit, OnChanges {
-
+export class DefaultTemplateComponent implements OnInit {
   @Input() formFieldProperties: any;
-  public formInputData: any = {};
+  public formInputData = {};
   router: Router;
   activatedRoute: ActivatedRoute;
   userId: String;
@@ -31,12 +29,6 @@ export class DefaultTemplateComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges() {
-    console.log(this.formFieldProperties)
-    this.formFieldProperties.forEach((field) => {
-      this.formInputData[field.code] = field.value;
-    });
-  }
   getUserDetails() {
     const requestData = {
       data: {
