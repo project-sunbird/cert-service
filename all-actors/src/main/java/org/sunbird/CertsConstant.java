@@ -2,14 +2,9 @@ package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.sunbird.message.IResponseMessage;
-import org.sunbird.message.ResponseCode;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * this constant file is used to get the Constants which is used by entire actors
