@@ -2,9 +2,14 @@ package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * this constant file is used to get the Constants which is used by entire actors
@@ -29,27 +34,25 @@ public class CertsConstant {
     private static final String SLUG = getSlugFormEnv();
     private static final String DOMAIN_SLUG = DOMAIN_URL + "/" + SLUG;
 
-    public String getBADGE_URL(String rootOrgId, String batchId) {
+    public String getBADGE_URL(String tag) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOMAIN_URL + "/" + SLUG);
-        if (StringUtils.isNotEmpty(rootOrgId))
-            stringBuilder.append("/" + rootOrgId);
-        if (StringUtils.isNotEmpty(batchId))
-            stringBuilder.append("/" + batchId);
+        if (StringUtils.isNotEmpty(tag))
+            stringBuilder.append("/" + tag);
         return stringBuilder.append("/" + BADGE_URL).toString();
     }
 
 
-    public String getISSUER_URL(String rootOrgId) {
-        return appendOrgIdIfExists(DOMAIN_SLUG, rootOrgId) + "/" + ISSUER_URL;
+    public String getISSUER_URL() {
+        return DOMAIN_SLUG + "/" + ISSUER_URL;
     }
 
     public String getCONTEXT() {
         return String.format("%s/%s/%s", DOMAIN_URL, SLUG, CONTEXT);
     }
 
-    public String getPUBLIC_KEY_URL(String rootOrgId, String keyId) {
-        return appendOrgIdIfExists(DOMAIN_SLUG, rootOrgId) + "/" + keyId + PUBLIC_KEY_URL;
+    public String getPUBLIC_KEY_URL(String keyId) {
+        return DOMAIN_SLUG + "/" + JsonKey.KEYS + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getVERIFICATION_TYPE() {
@@ -118,8 +121,8 @@ public class CertsConstant {
     }
 
 
-    public String getSignCreator(String orgId, String keyId) {
-        return appendOrgIdIfExists(DOMAIN_SLUG, orgId) + "/" + keyId + PUBLIC_KEY_URL;
+    public String getSignCreator(String keyId) {
+        return DOMAIN_SLUG + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getEncryptionServiceUrl() {
@@ -173,20 +176,6 @@ public class CertsConstant {
         return SLUG;
     }
 
-    /**
-     * appends orgId to the domain_slug if exists
-     *
-     * @param uri
-     * @param orgId
-     * @return
-     */
-    private String appendOrgIdIfExists(String uri, String orgId) {
-        if (StringUtils.isNotEmpty(orgId))
-            return uri + "/" + orgId;
-        else return uri;
-    }
-
-
     public String getPreview(String preview) {
         if (StringUtils.isNotBlank(preview))
             return preview;
@@ -224,5 +213,4 @@ public class CertsConstant {
         awsParams.put(JsonKey.KEY, getAwsStorageSecret());
         return awsParams;
     }
-
 }
