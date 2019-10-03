@@ -103,4 +103,10 @@ public interface JsonKey {
     String VERIFY_CERT = "verifyCert";
     String AZURE = "azure";
     String AWS = "aws";
+    String UUID = "uuid";
+    String SIGNATURE = "signature";
+    String SIGNATURE_VALUE = "signatureValue";
+    String VERIFICATION = "verification";
+    String CREATOR = "creator";
+    String STATUS = "status";
 }
