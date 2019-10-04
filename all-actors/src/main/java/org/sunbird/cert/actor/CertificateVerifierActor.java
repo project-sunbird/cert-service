@@ -1,5 +1,6 @@
 package org.sunbird.cert.actor;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
@@ -13,6 +14,7 @@ import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;
 import org.sunbird.JsonKey;
 import org.sunbird.actor.core.ActorConfig;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
@@ -22,9 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This actor is responsible for certificate verification.
+ *
+ */
 @ActorConfig(
         tasks = {JsonKey.VERIFY_CERT},
         asyncTasks = {}
@@ -72,17 +79,24 @@ public class CertificateVerifierActor extends BaseActor {
     }
 
 
-    private Map<String, Object> downloadCertJsonFromCloud(String uri) throws IOException {
-        String localPath = "conf/";
-        StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
-        CertStoreFactory certStoreFactory = new CertStoreFactory(null);
-        ICertStore certStore = certStoreFactory.getCertStore(storeConfig, false);
-        certStore.init();
-        certStore.get(null, uri, localPath);
-        File file = new File(localPath + getFileName(uri));
-        Map<String, Object> certificate = mapper.readValue(file, Map.class);
-        return certificate;
-    }
+    private Map<String, Object> downloadCertJsonFromCloud(String uri) throws IOException, BaseException {
+            String localPath = "conf/";
+            StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
+            CertStoreFactory certStoreFactory = new CertStoreFactory(null);
+            ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
+            certStore.init();
+            try {
+                certStore.get(null, uri, localPath);
+                File file = new File(localPath + getFileName(uri));
+                Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
+                });
+                return certificate;
+            } catch (StorageServiceException ex) {
+                logger.error("downloadCertJsonFromCloud:Exception Occurred while downloading json certificate from the cloud. : " + ex.getMessage());
+                throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
+                        uri, JsonKey.UUID), ResponseCode.CLIENT_ERROR.getCode());
+            }
+        }
 
     private String getFileName(String certId) {
         String idStr = null;

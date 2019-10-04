@@ -27,7 +27,7 @@ public class VerificationReqValidator {
         } else if (certReq.containsKey(JsonKey.UUID)) {
             validateParamUuid((String) certReq.get(JsonKey.UUID));
         } else {
-            throw new BaseException("MANDATORY_PARAMETER_MISSING",
+            throw new BaseException("INVALID_REQUESTED_DATA",
                     MessageFormat.format(IResponseMessage.INVALID_REQUESTED_DATA, JsonKey.CERTIFICATE),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
