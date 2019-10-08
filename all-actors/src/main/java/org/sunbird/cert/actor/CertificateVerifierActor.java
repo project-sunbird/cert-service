@@ -60,7 +60,7 @@ public class CertificateVerifierActor extends BaseActor {
             if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.DATA)) {
                 certificate = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.DATA);
             } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.UUID)) {
-                certificate = downloadCertJsonFromCloud((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.UUID));
+                certificate = downloadCertJson((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.UUID));
             }
             logger.info("Certificate extension " + certificate);
             if (certificate.containsKey(JsonKey.SIGNATURE)) {
@@ -79,7 +79,7 @@ public class CertificateVerifierActor extends BaseActor {
     }
 
 
-    private Map<String, Object> downloadCertJsonFromCloud(String uri) throws IOException, BaseException {
+    private Map<String, Object> downloadCertJson(String uri) throws IOException, BaseException {
             String localPath = "conf/";
             StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
             CertStoreFactory certStoreFactory = new CertStoreFactory(null);
@@ -92,7 +92,7 @@ public class CertificateVerifierActor extends BaseActor {
                 });
                 return certificate;
             } catch (StorageServiceException ex) {
-                logger.error("downloadCertJsonFromCloud:Exception Occurred while downloading json certificate from the cloud. : " + ex.getMessage());
+                logger.error("downloadCertJson:Exception Occurred while downloading json certificate from the cloud. : " + ex.getMessage());
                 throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
                         uri, JsonKey.UUID), ResponseCode.CLIENT_ERROR.getCode());
             }
