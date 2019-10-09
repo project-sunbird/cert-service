@@ -11,6 +11,8 @@ public interface ICertStore {
 
     void get(String url, String fileName, String localPath) throws IOException, StorageServiceException;
 
+    void get(String fileName) throws StorageServiceException;
+
     void init();
 
 

@@ -24,8 +24,8 @@ public class VerificationReqValidator {
         validateMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE);
         if (certReq.containsKey(JsonKey.DATA)) {
             validateMandatoryParamsPresent((Map) certReq.get(JsonKey.DATA), JsonKey.CERTIFICATE + "." + JsonKey.DATA);
-        } else if (certReq.containsKey(JsonKey.UUID)) {
-            validateParamUuid((String) certReq.get(JsonKey.UUID));
+        } else if (certReq.containsKey(JsonKey.ID)) {
+            validateParamUuid((String) certReq.get(JsonKey.ID));
         } else {
             throw new BaseException("INVALID_REQUESTED_DATA",
                     MessageFormat.format(IResponseMessage.INVALID_REQUESTED_DATA, JsonKey.CERTIFICATE),

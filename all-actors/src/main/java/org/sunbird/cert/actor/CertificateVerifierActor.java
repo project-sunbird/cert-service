@@ -3,6 +3,8 @@ package org.sunbird.cert.actor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
@@ -24,13 +26,21 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * This actor is responsible for certificate verification.
- *
  */
 @ActorConfig(
         tasks = {JsonKey.VERIFY_CERT},
@@ -54,49 +64,105 @@ public class CertificateVerifierActor extends BaseActor {
     }
 
     private void verifyCertificate(Request request) throws BaseException {
-        Boolean isVerify = false;
         Map<String, Object> certificate = new HashMap<>();
+        VerificationResponse verificationResponse = new VerificationResponse();
         try {
             if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.DATA)) {
                 certificate = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.DATA);
-            } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.UUID)) {
-                certificate = downloadCertJson((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.UUID));
+            } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.ID)) {
+                certificate = downloadCertJson((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
             }
             logger.info("Certificate extension " + certificate);
-            if (certificate.containsKey(JsonKey.SIGNATURE)) {
-                isVerify = verifySignature(certificate);
+            List<String> certificateType = (List<String>) ((Map) certificate.get(JsonKey.VERIFICATION)).get(JsonKey.TYPE);
+            if (JsonKey.HOSTED.equals(certificateType.get(0))) {
+                verificationResponse = verifyHostedCertificate(certificate);
+            } else if (JsonKey.SIGNED_BADGE.equals(certificateType.get(0))) {
+                verificationResponse = verifySignedCertificate(certificate);
             }
         } catch (IOException | SignatureException.UnreachableException | SignatureException.VerificationException ex) {
-            logger.error("verifyCertificate:Exception Occurred while verifying certificate. : " + ex.getMessage());
+            logger.error("verifySignedCertificate:Exception Occurred while verifying certificate. : " + ex.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
-        Map<String, Boolean> verifyRes = new HashMap<>();
-        verifyRes.put(JsonKey.STATUS, isVerify);
         Response response = new Response();
-        response.getResult().put("response", verifyRes);
+        response.getResult().put("response", verificationResponse);
         sender().tell(response, getSelf());
         logger.info("onReceive method call End");
     }
 
+    /**
+     * Verifies signed certificate , verify signature value nad expiry date
+     *
+     * @param certificate certificate object
+     * @return
+     * @throws SignatureException.UnreachableException
+     * @throws SignatureException.VerificationException
+     */
+    private VerificationResponse verifySignedCertificate(Map<String, Object> certificate) throws SignatureException.UnreachableException, SignatureException.VerificationException {
+        List<String> messages = new ArrayList<>();
+        CollectionUtils.addIgnoreNull(messages, verifySignature(certificate));
+        CollectionUtils.addIgnoreNull(messages, verifyExpiryDate((String) certificate.get(JsonKey.EXPIRES)));
+//        messages.add(verifySignature(certificate));
+//        messages.add(verifyExpiryDate((String) certificate.get(JsonKey.EXPIRES)));
+//        messages.removeAll(Collections.singleton(null));
+        return getVerificationResponse(messages);
+    }
 
-    private Map<String, Object> downloadCertJson(String uri) throws IOException, BaseException {
-            String localPath = "conf/";
-            StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
-            CertStoreFactory certStoreFactory = new CertStoreFactory(null);
-            ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
-            certStore.init();
-            try {
-                certStore.get(null, uri, localPath);
-                File file = new File(localPath + getFileName(uri));
-                Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
-                });
-                return certificate;
-            } catch (StorageServiceException ex) {
-                logger.error("downloadCertJson:Exception Occurred while downloading json certificate from the cloud. : " + ex.getMessage());
-                throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
-                        uri, JsonKey.UUID), ResponseCode.CLIENT_ERROR.getCode());
-            }
+    /**
+     * verifies the hosted certificate
+     * verifies expiry date
+     *
+     * @param certificate certificate object
+     * @return
+     */
+    private VerificationResponse verifyHostedCertificate(Map<String, Object> certificate) {
+        List<String> messages = new ArrayList<>();
+        messages.add(verifyExpiryDate((String) certificate.get(JsonKey.EXPIRES)));
+        messages.removeAll(Collections.singleton(null));
+        return getVerificationResponse(messages);
+    }
+
+    private VerificationResponse getVerificationResponse(List<String> messages) {
+        VerificationResponse verificationResponse = new VerificationResponse();
+        if (messages.size() == 0) {
+            verificationResponse.setValid(true);
+        } else {
+            verificationResponse.setValid(false);
         }
+        verificationResponse.setErrorCount(messages.size());
+        verificationResponse.setMessages(messages);
+        return verificationResponse;
+
+    }
+
+
+    /**
+     * to download certificate from cloud
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws BaseException
+     */
+    private Map<String, Object> downloadCertJson(String url) throws IOException, BaseException {
+        StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
+        CertStoreFactory certStoreFactory = new CertStoreFactory(null);
+        ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
+        certStore.init();
+        try {
+            String uri = new URL(url).getPath();
+            String fileName = getFileName(uri);
+            certStore.get(uri.substring("/".concat(certsConstant.getSlug().concat("/")).length()));
+            File file = new File("conf/" + fileName);
+            Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
+            });
+            file.delete();
+            return certificate;
+        } catch (StorageServiceException ex) {
+            logger.error("downloadCertJson:Exception Occurred while downloading json certificate from the cloud. : " + ex.getMessage());
+            throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
+                    url, JsonKey.ID), ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
 
     private String getFileName(String certId) {
         String idStr = null;
@@ -105,18 +171,53 @@ public class CertificateVerifierActor extends BaseActor {
             String path = uri.getPath();
             idStr = path.substring(path.lastIndexOf('/') + 1);
         } catch (URISyntaxException e) {
-            logger.debug("getUUID : exception occurred while getting file form the uri " + e.getMessage());
+            logger.debug("getFileName : exception occurred while getting file form the uri " + e.getMessage());
         }
         return idStr;
     }
 
-    private Boolean verifySignature(Map<String, Object> certificateExtension) throws SignatureException.UnreachableException, SignatureException.VerificationException {
+    /**
+     * verifying certificate signature value
+     *
+     * @param certificateExtension
+     * @return
+     * @throws SignatureException.UnreachableException
+     * @throws SignatureException.VerificationException
+     */
+    private String verifySignature(Map<String, Object> certificateExtension) throws SignatureException.UnreachableException, SignatureException.VerificationException {
         String signatureValue = ((Map<String, String>) certificateExtension.get(JsonKey.SIGNATURE)).get(JsonKey.SIGNATURE_VALUE);
+        String message = null;
         certificateExtension.remove(JsonKey.SIGNATURE);
         JsonNode jsonNode = mapper.valueToTree(certificateExtension);
         CertificateFactory certificateFactory = new CertificateFactory();
-        return certificateFactory.verifySignature(jsonNode, signatureValue, certsConstant.getEncryptionServiceUrl(),
+        Boolean isValid = certificateFactory.verifySignature(jsonNode, signatureValue, certsConstant.getEncryptionServiceUrl(),
                 ((Map<String, String>) certificateExtension.get(JsonKey.VERIFICATION)).get(JsonKey.CREATOR));
+        if (!isValid) {
+            message = "ERROR: Assertion.signature - certificate is not valid , signature verification failed";
+        }
+        return message;
+    }
+
+    private String verifyExpiryDate(String expiryDate) {
+        String message = null;
+        if (StringUtils.isNotBlank(expiryDate)) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            try {
+                Date currentDate = simpleDateFormat.parse(getCurrentDate());
+                if (simpleDateFormat.parse(expiryDate).before(currentDate)) {
+                    message = "ERROR: Assertion.expires - certificate has been expired";
+                }
+            } catch (ParseException e) {
+                logger.info("verifyExpiryDate : exception occurred parsing date " + e.getMessage());
+            }
+        }
+        return message;
+    }
+
+    private String getCurrentDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now);
     }
 
 

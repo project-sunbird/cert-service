@@ -19,6 +19,12 @@ public abstract class CloudStore implements ICertStore {
         download(fileName, localPath);
     }
 
+    @Override
+    public void get(String fileName) throws StorageServiceException {
+        String path = "conf/";
+        download(fileName, path);
+    }
+
     abstract public String upload(File file, String uploadPath);
 
     abstract public void download(String fileName, String localPath) throws StorageServiceException;
