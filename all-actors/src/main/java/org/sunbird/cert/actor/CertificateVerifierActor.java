@@ -70,9 +70,9 @@ public class CertificateVerifierActor extends BaseActor {
             if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.DATA)) {
                 certificate = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.DATA);
             } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.ID)) {
-                certificate = downloadCertJson((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
+                certificate = downloadCert((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
             }
-            logger.info("Certificate extension " + certificate);
+            logger.debug("Certificate extension " + certificate);
             List<String> certificateType = (List<String>) ((Map) certificate.get(JsonKey.VERIFICATION)).get(JsonKey.TYPE);
             if (JsonKey.HOSTED.equals(certificateType.get(0))) {
                 verificationResponse = verifyHostedCertificate(certificate);
@@ -101,9 +101,6 @@ public class CertificateVerifierActor extends BaseActor {
         List<String> messages = new ArrayList<>();
         CollectionUtils.addIgnoreNull(messages, verifySignature(certificate));
         CollectionUtils.addIgnoreNull(messages, verifyExpiryDate((String) certificate.get(JsonKey.EXPIRES)));
-//        messages.add(verifySignature(certificate));
-//        messages.add(verifyExpiryDate((String) certificate.get(JsonKey.EXPIRES)));
-//        messages.removeAll(Collections.singleton(null));
         return getVerificationResponse(messages);
     }
 
@@ -143,16 +140,16 @@ public class CertificateVerifierActor extends BaseActor {
      * @throws IOException
      * @throws BaseException
      */
-    private Map<String, Object> downloadCertJson(String url) throws IOException, BaseException {
+    private Map<String, Object> downloadCert(String url) throws IOException, BaseException {
         StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
         CertStoreFactory certStoreFactory = new CertStoreFactory(null);
         ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
         certStore.init();
         try {
             String uri = new URL(url).getPath();
-            String fileName = getFileName(uri);
-            certStore.get(uri.substring("/".concat(certsConstant.getSlug().concat("/")).length()));
-            File file = new File("conf/" + fileName);
+            String filePath = "conf/";
+            certStore.get(uri.substring(certsConstant.getSlug().length() + 2));
+            File file = new File(filePath + getFileName(uri));
             Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
             });
             file.delete();

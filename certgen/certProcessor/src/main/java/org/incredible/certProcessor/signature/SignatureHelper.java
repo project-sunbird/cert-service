@@ -34,6 +34,10 @@ public class SignatureHelper {
 
     private static Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
 
+    private final String signEndPoint = "sign/";
+
+    private final String verifyEndPoint = "verify";
+
 
     /**
      * This method calls signature service for signing the object
@@ -49,7 +53,7 @@ public class SignatureHelper {
         signReq.put(JsonKey.ENTITY, rootNode);
         CloseableHttpClient client = HttpClients.createDefault();
         logger.info("SignatureHelper:generateSignature:keyID:".concat(keyId));
-        String encServiceUrl = this.encServiceUrl.concat("/" + JsonKey.SIGN + "/").concat(keyId);
+        String encServiceUrl = this.encServiceUrl.concat("/" + signEndPoint).concat(keyId);
         logger.info("SignatureHelper:generateSignature:enc service url formed:".concat(encServiceUrl));
         HttpPost httpPost = new HttpPost(encServiceUrl);
         try {
@@ -80,7 +84,7 @@ public class SignatureHelper {
         signReq.put(JsonKey.ENTITY, rootNode);
         boolean result = false;
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(encServiceUrl.concat("/" + JsonKey.VERIFY));
+        HttpPost httpPost = new HttpPost(encServiceUrl.concat("/" + verifyEndPoint));
         httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         try {
             StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
