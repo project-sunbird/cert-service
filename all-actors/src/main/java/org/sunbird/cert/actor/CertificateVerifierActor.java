@@ -146,9 +146,9 @@ public class CertificateVerifierActor extends BaseActor {
         ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
         certStore.init();
         try {
-            String uri = new URL(url).getPath();
+            String uri = new URL(url).getPath().substring(1);
             String filePath = "conf/";
-            certStore.get(uri.substring(certsConstant.getSlug().length() + 2));
+            certStore.get(uri.substring(uri.indexOf("/")).substring(1));
             File file = new File(filePath + getFileName(uri));
             Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
             });
