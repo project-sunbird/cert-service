@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
+import org.incredible.pojos.ob.Criteria;
 import org.incredible.pojos.ob.Issuer;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class CertMapper {
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
         Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
+        Criteria criteria = getCriteria((Map<String, Object>) json.get(JsonKey.CRITERIA));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
             cert.setIssuer(issuer);
@@ -33,6 +35,7 @@ public class CertMapper {
             cert.setCourseName((String) json.get(JsonKey.COURSE_NAME));
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
+            cert.setCriteria(criteria);
             String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
             if (StringUtils.isBlank(issuedDate)) {
                 cert.setIssuedDate(getCurrentDate());
@@ -79,6 +82,14 @@ public class CertMapper {
         return issuer;
     }
 
+    private Criteria getCriteria(Map<String, Object> criteriaData) {
+        Criteria criteria = new Criteria();
+        String criteriaId = (String) criteriaData.get(JsonKey.ID);
+        if (StringUtils.isNotBlank(criteriaId))
+            criteria.setId(criteriaId);
+        criteria.setNarrative((String) criteriaData.get(JsonKey.NARRATIVE));
+        return criteria;
+    }
 
     private CertModel getCertModel(Map<String, Object> data) {
         CertModel certModel = new CertModel();
