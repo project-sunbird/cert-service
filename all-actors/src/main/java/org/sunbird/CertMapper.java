@@ -1,5 +1,7 @@
 package org.sunbird;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
@@ -83,12 +85,7 @@ public class CertMapper {
     }
 
     private Criteria getCriteria(Map<String, Object> criteriaData) {
-        Criteria criteria = new Criteria();
-        String criteriaId = (String) criteriaData.get(JsonKey.ID);
-        if (StringUtils.isNotBlank(criteriaId))
-            criteria.setId(criteriaId);
-        criteria.setNarrative((String) criteriaData.get(JsonKey.NARRATIVE));
-        return criteria;
+        return new ObjectMapper().convertValue(criteriaData, Criteria.class);
     }
 
     private CertModel getCertModel(Map<String, Object> data) {
@@ -106,7 +103,7 @@ public class CertMapper {
         List<String> validatedPublicKeys = new ArrayList<>();
         publicKeys.forEach((publicKey) -> {
             if (!publicKey.startsWith("http")) {
-                validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG)
+                validatedPublicKeys.add(properties.get(JsonKey.BASE_PATH)
                         .concat("/") + JsonKey.KEYS.concat("/") + publicKey.concat("_publicKey.json"));
             } else {
                 validatedPublicKeys.add(publicKey);

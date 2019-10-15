@@ -113,4 +113,5 @@ public interface JsonKey {
     String EXPIRES = "expires";
     String CRITERIA = "criteria";
     String NARRATIVE = "narrative";
+    String BASE_PATH = "basePath";
 }
