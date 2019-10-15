@@ -67,14 +67,13 @@ public class CertStoreFactory {
     public ICertStore getCertStore(StoreConfig storeConfig, Boolean preview) {
         ICertStore store = null;
         try {
-            String path = new URL(properties.get(JsonKey.BASE_PATH)).getPath();
+            String domainUrl = StringUtils.remove(properties.get(JsonKey.BASE_PATH), new URL(properties.get(JsonKey.BASE_PATH)).getPath());
             if (preview) {
-                StringUtils.remove(properties.get(JsonKey.BASE_PATH), path);
-                store = new LocalStore(StringUtils.remove(properties.get(JsonKey.BASE_PATH), path));
+                store = new LocalStore(domainUrl);
             } else if (storeConfig.isCloudStore()) {
                 store = getCloudStore(storeConfig);
             } else {
-                store = new LocalStore(StringUtils.remove(properties.get(JsonKey.BASE_PATH), path));
+                store = new LocalStore(domainUrl);
             }
         } catch (MalformedURLException e) {
 

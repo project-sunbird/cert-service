@@ -148,7 +148,7 @@ public class CertificateVerifierActor extends BaseActor {
         try {
             String uri = new URL(url).getPath().substring(1);
             String filePath = "conf/";
-            certStore.get(uri.substring(uri.indexOf("/")).substring(1));
+            certStore.get(StringUtils.substringAfter(uri, "/"));
             File file = new File(filePath + getFileName(uri));
             Map<String, Object> certificate = mapper.readValue(file, new TypeReference<Map<String, Object>>() {
             });
