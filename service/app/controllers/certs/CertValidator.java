@@ -65,7 +65,9 @@ public class CertValidator {
 
     private static void validateKeys(Map<String, Object> keys) throws BaseException {
         checkMandatoryParamsPresent(keys, JsonKey.CERTIFICATE + "." + JsonKey.KEYS, Arrays.asList(JsonKey.ID));
-        validateIssuerPublicKeys(keys);
+        if(CollectionUtils.isNotEmpty(publicKeys))  {
+            validateIssuerPublicKeys(keys);
+        }
     }
 
     /**
@@ -77,15 +79,13 @@ public class CertValidator {
      */
     private static void validateIssuerPublicKeys(Map<String, Object> keys) throws BaseException {
         List<String> keyIds = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(publicKeys)) {
-            publicKeys.forEach((publicKey) -> {
-                if (publicKey.startsWith("http")) {
-                    keyIds.add(getKeyFromPublicKeyUrl(publicKey));
-                } else {
-                    keyIds.add(publicKey);
-                }
-            });
-        }
+        publicKeys.forEach((publicKey) -> {
+            if (publicKey.startsWith("http")) {
+                keyIds.add(getKeyFromPublicKeyUrl(publicKey));
+            } else {
+                keyIds.add(publicKey);
+            }
+        });
         if (!keyIds.contains(keys.get(JsonKey.ID))) {
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
                     publicKeys, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER + "." + JsonKey.PUBLIC_KEY)
