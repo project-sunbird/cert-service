@@ -29,7 +29,7 @@ public class HTMLVarResolver {
     }
 
     public String getCourseName() {
-        //need to resolve
+        //todo need to resolve
         return certificateExtension.getBadge().getName();
     }
 
@@ -84,10 +84,6 @@ public class HTMLVarResolver {
     }
 
     public String getExpiryDate() {
-        return certificateExtension.getExpires();
-    }
-
-    public String getExpirationDate()   {
         return certificateExtension.getExpires();
     }
 

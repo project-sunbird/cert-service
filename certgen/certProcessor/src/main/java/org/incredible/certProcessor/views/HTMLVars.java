@@ -22,8 +22,6 @@ public class HTMLVars {
         //CompositeIdentityObject - profile
         $recipientName,
         $recipientId,
-        $courseName,
-        $qrCodeImage,
         //Assertion class
         $issuedDate,
         $expiryDate,
@@ -31,8 +29,10 @@ public class HTMLVars {
         $signatory0Image,
         $signatory0Designation,
         $signatory1Image,
-        $signatory1Designation
-
+        $signatory1Designation,
+        //others
+        $courseName,
+        $qrCodeImage,
     }
 }
 
