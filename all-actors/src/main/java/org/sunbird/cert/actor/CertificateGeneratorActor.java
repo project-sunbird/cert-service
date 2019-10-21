@@ -126,7 +126,7 @@ public class CertificateGeneratorActor extends BaseActor {
             CertificateResponse certificateResponse = new CertificateResponse();
             try {
                 certificateResponse = certificateGenerator.createCertificate(certModel, htmlTemplateZip);
-                Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams));
+                Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams), properties.get(JsonKey.BASE_PATH));
                 certUrlList.add(getResponse(certificateResponse, uploadRes));
             } catch (Exception ex) {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
@@ -141,13 +141,15 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("onReceive method call End");
     }
 
-    private Map<String, Object> uploadCertificate(String fileName, ICertStore certStore, String cloudPath) throws BaseException, IOException {
+    private Map<String, Object> uploadCertificate(String fileName, ICertStore certStore, String cloudPath, String basePath) throws BaseException, IOException {
         certStore.init();
         Map<String, Object> resMap = new HashMap<>();
         File file = FileUtils.getFile(fileName.concat(".pdf"));
-        resMap.put(JsonKey.PDF_URL, certStore.save(file, cloudPath));
+        String pdfUrl = certStore.save(file, cloudPath);
+        resMap.put(JsonKey.PDF_URL, basePath + pdfUrl);
         file = FileUtils.getFile(fileName.concat(".json"));
-        resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
+        String jsonUrl = certStore.save(file, cloudPath);
+        resMap.put(JsonKey.JSON_URL, basePath + jsonUrl);
         if (StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
             logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
             throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
