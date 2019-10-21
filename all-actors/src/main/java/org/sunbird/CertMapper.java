@@ -25,7 +25,11 @@ public class CertMapper {
     public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
-        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER), (Map<String, Object>) json.get(JsonKey.KEYS));
+        Map<String, Object> issuerData = (Map<String, Object>) json.get(JsonKey.ISSUER);
+        Issuer issuer = getIssuer(issuerData);
+        List<String> publicKeys = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY),
+                (Map<String, Object>) json.get(JsonKey.KEYS));
+        issuer.setPublicKey(publicKeys.toArray(new String[0]));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
@@ -66,15 +70,10 @@ public class CertMapper {
     }
 
 
-    private Issuer getIssuer(Map<String, Object> issuerData, Map<String, Object> keyId) {
+    private Issuer getIssuer(Map<String, Object> issuerData) {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
-        List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), keyId);
-        if (CollectionUtils.isNotEmpty(keyList)) {
-            String[] keyArr = keyList.stream().toArray(String[]::new);
-            issuer.setPublicKey(keyArr);
-        }
         return issuer;
     }
 
