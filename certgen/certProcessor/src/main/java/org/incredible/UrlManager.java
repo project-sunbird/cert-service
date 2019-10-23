@@ -36,13 +36,13 @@ public class UrlManager {
         return url.replace(containerNameStr,"");
     }
 
-    public static String getUri(String pdfUrl) throws MalformedURLException {
-        if (pdfUrl.startsWith("http")) {
-            String uri = StringUtils.substringAfter(new URL(pdfUrl).getPath(), "/");
+    public static String getUri(String url) throws MalformedURLException {
+        if (url.startsWith("http")) {
+            String uri = StringUtils.substringAfter(new URL(url).getPath(), "/");
             String[] path = uri.split("/");
             return StringUtils.join(path, "/", path.length - 2, path.length);
         } else {
-            return pdfUrl;
+            return url;
         }
     }
 }
