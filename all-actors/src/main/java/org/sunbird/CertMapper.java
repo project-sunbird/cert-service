@@ -1,10 +1,13 @@
 package org.sunbird;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
+import org.incredible.pojos.ob.Criteria;
 import org.incredible.pojos.ob.Issuer;
 
 import java.time.LocalDateTime;
@@ -31,6 +34,7 @@ public class CertMapper {
                 (Map<String, Object>) json.get(JsonKey.KEYS));
         issuer.setPublicKey(publicKeys.toArray(new String[0]));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
+        Criteria criteria = getCriteria((Map<String, Object>) json.get(JsonKey.CRITERIA));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
             cert.setIssuer(issuer);
@@ -38,6 +42,7 @@ public class CertMapper {
             cert.setCourseName((String) json.get(JsonKey.COURSE_NAME));
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
+            cert.setCriteria(criteria);
             String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
             if (StringUtils.isBlank(issuedDate)) {
                 cert.setIssuedDate(getCurrentDate());
@@ -77,6 +82,9 @@ public class CertMapper {
         return issuer;
     }
 
+    private Criteria getCriteria(Map<String, Object> criteriaData) {
+        return new ObjectMapper().convertValue(criteriaData, Criteria.class);
+    }
 
     private CertModel getCertModel(Map<String, Object> data) {
         CertModel certModel = new CertModel();
