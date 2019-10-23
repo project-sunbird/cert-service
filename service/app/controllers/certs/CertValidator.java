@@ -181,6 +181,11 @@ public class CertValidator {
         }
     }
 
+    /**
+     * validates tagId , if tagId contains any special character except '_' then tagId is invalid
+     * @param tag
+     * @throws BaseException
+     */
     private void validateTagId(String tag) throws BaseException {
         if(StringUtils.isNotBlank(tag)) {
             Pattern pattern = Pattern.compile(TAG_REGX);

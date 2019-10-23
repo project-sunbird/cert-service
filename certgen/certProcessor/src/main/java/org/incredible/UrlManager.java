@@ -36,6 +36,13 @@ public class UrlManager {
         return url.replace(containerNameStr,"");
     }
 
+    /**
+     * getting substring from url after domainUrl/slug
+     * for example for the url  domainUrl/slug/tagId/uuid.pdf then return tagId/uuid.pdf
+     * @param url
+     * @return
+     * @throws MalformedURLException
+     */
     public static String getUri(String url) throws MalformedURLException {
         if (url.startsWith("http")) {
             String uri = StringUtils.substringAfter(new URL(url).getPath(), "/");
