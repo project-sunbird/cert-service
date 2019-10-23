@@ -127,7 +127,7 @@ public class CertificateGeneratorActor extends BaseActor {
             try {
                 certificateResponse = certificateGenerator.createCertificate(certModel, htmlTemplateZip);
                 Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams));
-                certUrlList.add(getResponse(certificateResponse, getUploadResultMap(uploadRes, properties.get(JsonKey.BASE_PATH))));
+                certUrlList.add(getResponse(certificateResponse, getResultWithBasePath(uploadRes, properties.get(JsonKey.BASE_PATH))));
             } catch (Exception ex) {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
@@ -141,7 +141,13 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("onReceive method call End");
     }
 
-    private Map<String, Object> getUploadResultMap(Map<String, Object> uploadRes, String basePath) {
+    /**
+     * prefix basePath to the pdf Url and json Url
+     * @param uploadRes
+     * @param basePath
+     * @return
+     */
+    private Map<String, Object> getResultWithBasePath(Map<String, Object> uploadRes, String basePath) {
         uploadRes.replace(JsonKey.JSON_URL, basePath.concat((String) uploadRes.get(JsonKey.JSON_URL)));
         uploadRes.replace(JsonKey.PDF_URL, basePath.concat((String) uploadRes.get(JsonKey.PDF_URL)));
         return uploadRes;
