@@ -43,7 +43,7 @@ public class UrlManager {
      * @return
      * @throws MalformedURLException
      */
-    public static String getUri(String url) throws MalformedURLException {
+    public static String getContainerRelativePath(String url) throws MalformedURLException {
         if (url.startsWith("http")) {
             String uri = StringUtils.substringAfter(new URL(url).getPath(), "/");
             String[] path = uri.split("/");
