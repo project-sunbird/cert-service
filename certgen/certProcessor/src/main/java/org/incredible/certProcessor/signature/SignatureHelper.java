@@ -98,7 +98,7 @@ public class SignatureHelper {
             throw new SignatureException().new UnreachableException(ex.getMessage());
         } catch (Exception e) {
             logger.error("Exception occurred  while verifying signature:{} ", e.getMessage());
-            throw new SignatureException().new VerificationException("verifing signature failed");
+            throw new SignatureException().new VerificationException("");
         }
         logger.debug("verify method ends with value {}", result);
         return result;
