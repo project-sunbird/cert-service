@@ -19,11 +19,11 @@ public class PdfConverter {
     public static void convertor(File htmlSource, String certUuid, String directory) {
         File file = new File(directory, certUuid + ".pdf");
         try {
-            boolean licenseEnabled = Boolean.parseBoolean(System.getenv(JsonKey.ITEXT_LICENSE_ENABLED));
-            if(licenseEnabled) {
+            if(Boolean.parseBoolean(System.getenv(JsonKey.ITEXT_LICENSE_ENABLED))) {
                 String licensePath = System.getenv(JsonKey.ITEXT_LICENSE_PATH);
                 InputStream ip = PdfConverter.class.getResourceAsStream(licensePath);
                 LicenseKey.loadLicenseFile(ip);
+                logger.info("license is loaded");
             }
             HtmlConverter.convertToPdf(htmlSource, file);
             logger.info("Pdf file is created ");
