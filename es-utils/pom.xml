@@ -65,12 +65,6 @@
 					<configuration>
 						<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 						<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
-						<excludes>
-							<exclude>**/common/**</exclude>
-							<exclude>**/routes/**</exclude>
-							<exclude>**/Reverse*/**</exclude>
-							<exclude>**/*.javascript/**</exclude>
-						</excludes>
 					</configuration>
 					<executions>
 						<execution>
