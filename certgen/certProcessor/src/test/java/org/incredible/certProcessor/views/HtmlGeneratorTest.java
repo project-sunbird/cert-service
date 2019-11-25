@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -34,5 +35,7 @@ public class HtmlGeneratorTest {
     certificateExtension.setId("https://dev.sunbirded.org/certs/01284093466818969624/41eac01b-da5d-4cf6-b101-bc173d8d5205");
     PowerMockito.doNothing().when(PdfConverter.class, "convertor", Mockito.any(File.class), Mockito.anyString(), Mockito.anyString());
     htmlGenerator.generate(certificateExtension ,directory);
+    PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+    PdfConverter.convertor(Mockito.any(File.class), Mockito.anyString(), Mockito.anyString());
   }
 }

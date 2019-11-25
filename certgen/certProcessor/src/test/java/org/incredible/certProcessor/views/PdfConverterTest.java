@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -41,6 +42,10 @@ public class PdfConverterTest {
     PowerMockito.doNothing().when(HtmlConverter.class, "convertToPdf", Mockito.any(File.class), Mockito.any(File.class));
     PowerMockito.doNothing().when(LicenseKey.class,"loadLicenseFile", Mockito.any(InputStream.class));
     PdfConverter.convertor(htmlFile, certUuid, directory);
+    PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+    LicenseKey.loadLicenseFile(Mockito.any(InputStream.class));
+    PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+    HtmlConverter.convertToPdf(Mockito.any(File.class), Mockito.any(File.class));
   }
 
   private String licenseDetails(String input) {
