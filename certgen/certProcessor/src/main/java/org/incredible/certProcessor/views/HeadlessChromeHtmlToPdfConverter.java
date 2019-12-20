@@ -21,7 +21,7 @@ public class HeadlessChromeHtmlToPdfConverter {
             String appInvokeCommand = "";
             String appArgs = "--no-sandbox --headless --print-to-pdf=" + pdfFile.getAbsolutePath() + " " + htmlFile.getAbsolutePath();
             Runtime rt = Runtime.getRuntime();
-            logger.info("HeadlessChromeHtmlToPdfConverter: convert: operating system being is {}", operatingSystem);
+            logger.info("HeadlessChromeHtmlToPdfConverter: convert: operating system used is {}", operatingSystem);
             if (isWindows) {
                 appInvokeCommand = "chromium-browser";
                 process = rt.exec(new String[]{"cmd.exe", "/c", appInvokeCommand + " " + appArgs});
