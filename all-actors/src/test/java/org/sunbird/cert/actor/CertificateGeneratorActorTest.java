@@ -96,7 +96,7 @@ public class CertificateGeneratorActorTest {
         TestKit probe = new TestKit(system);
         ActorRef subject = system.actorOf(props);
         subject.tell(request, probe.getRef());
-        Response res = probe.expectMsgClass(Duration.create(10000000, TimeUnit.SECONDS),Response.class);
+        Response res = probe.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
