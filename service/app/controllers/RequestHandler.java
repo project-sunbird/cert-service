@@ -2,6 +2,7 @@ package controllers;
 
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import org.incredible.certProcessor.JsonKey;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -16,7 +17,6 @@ import play.mvc.Result;
 import play.mvc.Results;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-import org.sunbird.JsonKey;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;

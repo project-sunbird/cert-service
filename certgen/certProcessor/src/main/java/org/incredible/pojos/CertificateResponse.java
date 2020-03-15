@@ -5,15 +5,17 @@ public class CertificateResponse {
     private String accessCode;
     private String jsonData;
     private String recipientId;
-
+    private String pdfLink;
+    private String jsonLink;
     public CertificateResponse() {
     }
 
-    public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId) {
+    public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId, String pdfLink) {
         this.uuid = uuid;
         this.accessCode = accessCode;
         this.jsonData = jsonData;
         this.recipientId = recipientId;
+        this.pdfLink = pdfLink;
     }
 
     public String getUuid() {
@@ -47,4 +49,21 @@ public class CertificateResponse {
     public void setRecipientId(String recipientId) {
         this.recipientId = recipientId;
     }
+
+    public String getPdfLink() {
+        return pdfLink;
+    }
+
+    public void setPdfLink(String pdfLink) {
+        this.pdfLink = pdfLink;
+    }
+
+    public String getJsonLink() {
+        return jsonLink;
+    }
+
+    public void setJsonLink(String jsonLink) {
+        this.jsonLink = jsonLink;
+    }
+
 }

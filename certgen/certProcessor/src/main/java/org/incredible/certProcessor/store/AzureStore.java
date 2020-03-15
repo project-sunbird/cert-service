@@ -38,6 +38,18 @@ public class AzureStore extends CloudStore {
     }
 
     @Override
+    public String uploadFile(File file, String uploadPath) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(uploadPath);
+        if (StringUtils.isNotBlank(azureStoreConfig.getAzureStoreConfig().getPath())) {
+            stringBuilder.append(azureStoreConfig.getAzureStoreConfig().getPath() + "/");
+        }
+        CloudStorage cloudStorage = new CloudStorage(storageService);
+        int retryCount = Integer.parseInt(azureStoreConfig.getCloudRetryCount());
+        return cloudStorage.upload(azureStoreConfig.getAzureStoreConfig().getContainerName(), stringBuilder.toString(), file, false, retryCount);
+    }
+
+    @Override
     public void download(String fileName, String localPath) throws StorageServiceException {
         CloudStorage cloudStorage = new CloudStorage(storageService);
         cloudStorage.downloadFile(azureStoreConfig.getAzureStoreConfig().getContainerName(), fileName, localPath, false);

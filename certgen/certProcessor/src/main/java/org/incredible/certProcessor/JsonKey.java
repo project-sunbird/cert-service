@@ -1,6 +1,7 @@
 package org.incredible.certProcessor;
 
 public interface JsonKey {
+
     String CLAIM = "claim";
     String SIGNATURE_VALUE = "signatureValue";
     String KEY_ID = "keyId";
@@ -45,4 +46,79 @@ public interface JsonKey {
 
     String ITEXT_LICENSE_ENABLED = "ITEXT_LICENSE_ENABLED";
     String ITEXT_LICENSE_PATH = "ITEXT_LICENSE_PATH";
+
+    String CLASS = "class";
+    String DATA = "data";
+    String EKS = "eks";
+    String LEVEL = "level";
+    String MESSAGE = "message";
+    String METHOD = "method";
+    String REQUEST_MESSAGE_ID = "msgId";
+    String STACKTRACE = "stacktrace";
+    String VER = "ver";
+    String OK = "ok";
+    String LOG_LEVEL = "logLevel";
+    String ERROR = "error";
+    String EMPTY_STRING = "";
+    String RESPONSE = "response";
+    String ADDRESS = "address";
+    String ERROR_MSG = "error_msg";
+    String ATTRIBUTE = "attribute";
+    String ERRORS = "errors";
+    String SUCCESS = "success";
+
+    String CERTIFICATE = "certificate";
+    String RECIPIENT_NAME = "recipientName";
+    String COURSE_NAME = "courseName";
+    String NAME = "name";
+    String HTML_TEMPLATE = "htmlTemplate";
+    String ISSUER = "issuer";
+    String URL = "url";
+    String SIGNATORY_LIST = "signatoryList";
+    String DESIGNATION = "designation";
+    String SIGNATORY_IMAGE = "image";
+
+    String ASSESSED_DOMAIN = "ASSESSED_DOMAIN";
+    String TEMPLATE_URL = "TEMPLATE_URL";
+    String SIGNATORY_EXTENSION = "SIGNATORY_EXTENSION";
+    String RECIPIENT_EMAIl = "recipientEmail";
+    String RECIPIENT_PHONE = "recipientPhone";
+    String RECIPIENT_ID = "recipientId";
+    String VALID_FROM = "validFrom";
+    String EXPIRY = "expiry";
+    String OLD_ID = "oldId";
+    String PUBLIC_KEY = "publicKey";
+    String DESCRIPTION = "description";
+    String LOGO = "logo";
+    String ISSUE_DATE = "issuedDate";
+    String USER = "user";
+    String CERTIFICATE_NAME = "name";
+
+    String ORG_ID = "orgId";
+    String KEYS = "keys";
+    String JSON_URL = "jsonUrl";
+    String PDF_URL = "pdfUrl";
+    String UNIQUE_ID = "id";
+    String GENERATE_CERT = "generateCert";
+    String GET_SIGN_URL = "getSignUrl";
+    String SIGNED_URL = "signedUrl";
+
+    String ACCESS_CODE = "accessCode";
+    String JSON_DATA = "jsonData";
+
+    String STORE = "store";
+    String key = "key";
+    String VERIFY_CERT = "verifyCert";
+    String UUID = "uuid";
+    String SIGNATURE = "signature";
+    String VERIFICATION = "verification";
+    String CREATOR = "creator";
+    String SIGNED_BADGE = "SignedBadge";
+    String EXPIRES = "expires";
+    String CRITERIA = "criteria";
+    String NARRATIVE = "narrative";
+    String RESULT = "result";
+    String REQUEST = "request";
+    String QR_IMAGE_URL = "qrImageUrl";
+    String QR_CODE_FILE = "qrCodeFile";
 }
