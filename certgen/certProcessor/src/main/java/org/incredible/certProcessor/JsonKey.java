@@ -121,4 +121,11 @@ public interface JsonKey {
     String REQUEST = "request";
     String QR_IMAGE_URL = "qrImageUrl";
     String QR_CODE_FILE = "qrCodeFile";
+    String PUBLIC = "public";
+    String PRIVATE = "private";
+    String PUBLIC_AZURE_STORAGE_KEY = "PUBLIC_AZURE_STORAGE_KEY";
+    String PUBLIC_AZURE_STORAGE_SECRET = "PUBLIC_AZURE_STORAGE_SECRET";
+    String PUBLIC_AWS_STORAGE_KEY = "PUBLIC_AWS_STORAGE_KEY";
+    String PUBLIC_AWS_STORAGE_SECRET = "PUBLIC_AWS_STORAGE_SECRET";
+    String PUBLIC_CONTAINER_NAME = "PUBLIC_CONTAINER_NAME";
 }

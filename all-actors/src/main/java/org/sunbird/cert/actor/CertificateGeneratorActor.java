@@ -213,7 +213,7 @@ public class CertificateGeneratorActor extends BaseActor {
         if (MapUtils.isNotEmpty(storeParams)) {
             return storeParams;
         } else {
-            return certVar.getStorageParamsFromEvn();
+            return certVar.getStorageParamsFromEvn(JsonKey.PRIVATE);
         }
     }
 

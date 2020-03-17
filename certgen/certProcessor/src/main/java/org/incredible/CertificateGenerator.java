@@ -133,8 +133,7 @@ public class CertificateGenerator {
 
     private Map<String, Object> getStorageParamsFromEnv() {
         CertsConstant certVar = new CertsConstant();
-        Map<String, Object> storeParams = certVar.getStorageParamsFromEvn();
-        storeParams.put(JsonKey.containerName, System.getenv("qr_container_name"));
+        Map<String, Object> storeParams = certVar.getStorageParamsFromEvn(JsonKey.PUBLIC);
         return storeParams;
     }
 }

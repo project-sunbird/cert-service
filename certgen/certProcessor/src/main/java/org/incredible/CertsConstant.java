@@ -88,8 +88,6 @@ public class CertsConstant {
     private static String getDomainUrlFromEnv() {
         String domainUrl = getPropertyFromEnv(JsonKey.DOMAIN_URL);
         return StringUtils.isNotBlank(domainUrl) ? domainUrl : "https://dev.sunbirded.org";
-//        validateEnvProperty(domainUrl);
-//        return domainUrl;
     }
 
     private static String getContainerNameFromEnv() {
@@ -113,8 +111,6 @@ public class CertsConstant {
 
     private static String getEncServiceUrl() {
         String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
-//        validateEnvProperty(encServiceUrl);
-//        return encServiceUrl;
         return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "http://enc-service:8013";
 
     }
@@ -176,8 +172,6 @@ public class CertsConstant {
     private static String getSlugFormEnv() {
         String slug = getPropertyFromEnv(JsonKey.SLUG);
         return StringUtils.isNotBlank(slug) ? slug : "certs";
-//        validateEnvProperty(slug);
-//        return slug;
     }
 
     public String getSlug() {
@@ -190,35 +184,49 @@ public class CertsConstant {
         return Boolean.toString(false);
     }
 
-    public Map<String, Object> getStorageParamsFromEvn() {
+    public Map<String, Object> getStorageParamsFromEvn(String storageType) {
         logger.info("getting storage params from env");
         String type = getCloudStorageType();
         Map<String, Object> storeParams = new HashMap<>();
         storeParams.put(JsonKey.TYPE, type);
         if (StringUtils.isNotBlank(type)) {
             if (type.equals(JsonKey.AZURE)) {
-                storeParams.put(JsonKey.AZURE, getAzureParams());
+                storeParams.put(JsonKey.AZURE, getAzureParams(storageType));
             }
             if (type.equals(JsonKey.AWS)) {
-                storeParams.put(JsonKey.AWS, getAwsParams());
+                storeParams.put(JsonKey.AWS, getAwsParams(storageType));
             }
         }
         return storeParams;
     }
 
-    private Map<String, String> getAzureParams() {
+    private Map<String, String> getAzureParams(String storageType) {
         Map<String, String> azureParams = new HashMap<>();
-        azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
-        azureParams.put(JsonKey.ACCOUNT, getAzureStorageKey());
-        azureParams.put(JsonKey.KEY, getAzureStorageSecret());
+        if (JsonKey.PRIVATE.equalsIgnoreCase(storageType)) {
+            azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
+            azureParams.put(JsonKey.ACCOUNT, getAzureStorageKey());
+            azureParams.put(JsonKey.KEY, getAzureStorageSecret());
+        } else {
+            // For public container
+            azureParams.put(JsonKey.containerName, getPropertyFromEnv(JsonKey.PUBLIC_CONTAINER_NAME));
+            azureParams.put(JsonKey.ACCOUNT, getPropertyFromEnv(JsonKey.PUBLIC_AZURE_STORAGE_KEY));
+            azureParams.put(JsonKey.KEY, getPropertyFromEnv(JsonKey.PUBLIC_AZURE_STORAGE_SECRET));
+        }
         return azureParams;
     }
 
-    private Map<String, String> getAwsParams() {
+    private Map<String, String> getAwsParams(String storageType) {
         Map<String, String> awsParams = new HashMap<>();
-        awsParams.put(JsonKey.containerName, getCONTAINER_NAME());
-        awsParams.put(JsonKey.ACCOUNT, getAwsStorageKey());
-        awsParams.put(JsonKey.KEY, getAwsStorageSecret());
+        if (JsonKey.PRIVATE.equalsIgnoreCase(storageType)) {
+            awsParams.put(JsonKey.containerName, getCONTAINER_NAME());
+            awsParams.put(JsonKey.ACCOUNT, getAwsStorageKey());
+            awsParams.put(JsonKey.KEY, getAwsStorageSecret());
+        } else {
+            // For public container
+            awsParams.put(JsonKey.containerName, getPropertyFromEnv(JsonKey.PUBLIC_CONTAINER_NAME));
+            awsParams.put(JsonKey.ACCOUNT, getPropertyFromEnv(JsonKey.PUBLIC_AWS_STORAGE_KEY));
+            awsParams.put(JsonKey.KEY, getPropertyFromEnv(JsonKey.PUBLIC_AWS_STORAGE_SECRET));
+        }
         return awsParams;
     }
 }
