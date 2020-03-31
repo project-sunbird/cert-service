@@ -81,18 +81,13 @@ public class CertificateGenerator {
         return StringUtils.substringBefore(idStr, ".");
     }
 
-    public String generateCertificateJson(CertificateExtension certificateExtension) {
+    public String generateCertificateJson(CertificateExtension certificateExtension) throws IOException {
         checkDirectoryExists();
         File file = new File(directory + getUUID(certificateExtension.getId()) + ".json");
-        String jsonData = null;
-        try {
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.writeValue(file, certificateExtension);
-            jsonData = objectMapper.writeValueAsString(certificateExtension);
-            logger.info("Json file has been generated for the certificate");
-        } catch (IOException e) {
-            logger.error("Exception while generating json");
-        }
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.writeValue(file, certificateExtension);
+        String jsonData = objectMapper.writeValueAsString(certificateExtension);
+        logger.info("Json file has been generated for the certificate");
         return jsonData;
     }
 
