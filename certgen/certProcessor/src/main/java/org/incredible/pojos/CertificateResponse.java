@@ -10,6 +10,14 @@ public class CertificateResponse {
     public CertificateResponse() {
     }
 
+    public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId) {
+        this.uuid = uuid;
+        this.accessCode = accessCode;
+        this.jsonData = jsonData;
+        this.recipientId = recipientId;
+        this.pdfLink = pdfLink;
+    }
+
     public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId, String pdfLink) {
         this.uuid = uuid;
         this.accessCode = accessCode;

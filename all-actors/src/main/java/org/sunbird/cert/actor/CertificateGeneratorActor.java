@@ -14,6 +14,8 @@ import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
+import org.incredible.certProcessor.views.PdfGenerator;
+import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.CertificateResponse;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
@@ -50,6 +52,7 @@ public class CertificateGeneratorActor extends BaseActor {
     private Logger logger = Logger.getLogger(CertificateGeneratorActor.class);
     private static CertsConstant certVar = new CertsConstant();
     private ObjectMapper mapper = new ObjectMapper();
+    String directory = "conf/";
 
     @Override
     public void onReceive(Request request) throws Throwable {
@@ -109,19 +112,23 @@ public class CertificateGeneratorActor extends BaseActor {
         ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         CertMapper certMapper = new CertMapper(properties);
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
-        String directory = "conf/";
         CertificateGenerator certificateGenerator = new CertificateGenerator(properties);
         List<Map<String, Object>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
-            CertificateResponse certificateResponse = new CertificateResponse();
+            CertificateResponse certificateResponse = null;
             try {
-                certificateResponse = certificateGenerator.createCertificate(certModel,htmlTemplateUrl,getContainerName(storeParams),certStoreFactory.setCloudPath(storeParams));
-                if(StringUtils.isNotBlank(certificateResponse.getPdfLink())) {
-                    Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams));
-                    certificateResponse.setJsonLink(properties.get(JsonKey.BASE_PATH).concat((String)uploadRes.get(JsonKey.JSON_URL)));
-                    certificateResponse.setPdfLink(properties.get(JsonKey.BASE_PATH).concat(certificateResponse.getPdfLink()));
-                    certUrlList.add(getResponse(certificateResponse));
-                }
+                CertificateExtension certificateExtension = certificateGenerator.getCertificateExtension(certModel);
+                Map<String,Object> qrMap = certificateGenerator.generateQR(certificateExtension);
+                String pdfLink = PdfGenerator.generate(htmlTemplateUrl,certificateExtension,qrMap, getContainerName(storeParams),certStoreFactory.setCloudPath(storeParams));
+                String uuid = certificateGenerator.getUUID(certificateExtension.getId());
+                String accessCode = (String)qrMap.get(JsonKey.ACCESS_CODE);
+                String jsonData = certificateGenerator.generateCertificateJson(certificateExtension);
+                certificateResponse = new CertificateResponse(uuid, accessCode , jsonData, certModel.getIdentifier(), pdfLink);
+
+                Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams));
+                certificateResponse.setJsonLink(properties.get(JsonKey.BASE_PATH).concat((String)uploadRes.get(JsonKey.JSON_URL)));
+                certificateResponse.setPdfLink(properties.get(JsonKey.BASE_PATH).concat(certificateResponse.getPdfLink()));
+                certUrlList.add(getResponse(certificateResponse));
             } catch (Exception ex) {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());

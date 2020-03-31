@@ -56,21 +56,20 @@ public class CertificateGenerator {
         this.properties = properties;
     }
 
-    public CertificateResponse createCertificate(CertModel certModel, String htmlTemplateUrl, String container, String path) throws
-            SignatureException.UnreachableException, InvalidDateFormatException, SignatureException.CreationException,
-            IOException, FontFormatException, NotFoundException, WriterException {
+    public CertificateExtension getCertificateExtension (CertModel certModel) throws SignatureException.UnreachableException,
+            InvalidDateFormatException, SignatureException.CreationException, IOException {
+        return certificateFactory.createCertificate(certModel, properties);
+    }
 
-        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
-        String jsonData = generateCertificateJson(certificateExtension);
+    public Map<String,Object> generateQR(CertificateExtension certificateExtension) throws WriterException, FontFormatException,
+            NotFoundException, IOException {
         Map<String,Object> qrMap = generateQrCode(certificateExtension);
         String qrImageUrl = uploadQrCode((File)qrMap.get(JsonKey.QR_CODE_FILE));
         qrMap.put(JsonKey.QR_IMAGE_URL,qrImageUrl);
-        String uuid = getUUID(certificateExtension.getId());
-        String pdfLink = PdfGenerator.generate(htmlTemplateUrl,certificateExtension,qrMap, container, path);
-        return new CertificateResponse(uuid, (String)qrMap.get(JsonKey.ACCESS_CODE), jsonData, certModel.getIdentifier(), pdfLink);
+        return qrMap;
     }
 
-    private String getUUID(String certId) {
+    public String getUUID(String certId) {
         String idStr;
         try {
             URI uri = new URI(certId);
@@ -82,7 +81,7 @@ public class CertificateGenerator {
         return StringUtils.substringBefore(idStr, ".");
     }
 
-    private String generateCertificateJson(CertificateExtension certificateExtension) {
+    public String generateCertificateJson(CertificateExtension certificateExtension) {
         checkDirectoryExists();
         File file = new File(directory + getUUID(certificateExtension.getId()) + ".json");
         String jsonData = null;

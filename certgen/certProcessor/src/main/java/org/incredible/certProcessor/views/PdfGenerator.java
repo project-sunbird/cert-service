@@ -25,27 +25,22 @@ public class PdfGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(PdfGenerator.class);
     private static ObjectMapper mapper = new ObjectMapper();
-    private static final String PRINT_SERVICE_URL = "http://localhost:5000/v1/print/pdf";//print-service:5000/v1/print/pdf
+    private static final String PRINT_SERVICE_URL = "print-service:5000/v1/print/pdf";
 
     public static String generate(String htmlTemplateUrl, CertificateExtension certificateExtension , Map<String,Object> qrMap,
-                                  String container, String path) {
-        try {
-            Map<String, Object> printServiceReq = new HashMap<>();
-            Map<String, Object> request = new HashMap<>();
-            printServiceReq.put(JsonKey.REQUEST, request);
-            request.put("context", getContext(certificateExtension, qrMap));
-            request.put(JsonKey.HTML_TEMPLATE, htmlTemplateUrl);
-            Map<String, String> storageParams = new HashMap<>();
-            storageParams.put(JsonKey.containerName,container);
-            storageParams.put(JsonKey.PATH,path);
-            request.put("storageParams",storageParams);
-            String pdfUrl = callPrintService(printServiceReq);
-            String [] arr = pdfUrl.split("/");
-            return "/"+path+arr[arr.length-1];
-        } catch (Exception ex) {
-            logger.error("Exception occurred while generating pdf :: "+ex.getMessage(),ex);
-        }
-        return "";
+                                  String container, String path) throws IOException {
+        Map<String, Object> printServiceReq = new HashMap<>();
+        Map<String, Object> request = new HashMap<>();
+        printServiceReq.put(JsonKey.REQUEST, request);
+        request.put("context", getContext(certificateExtension, qrMap));
+        request.put(JsonKey.HTML_TEMPLATE, htmlTemplateUrl);
+        Map<String, String> storageParams = new HashMap<>();
+        storageParams.put(JsonKey.containerName,container);
+        storageParams.put(JsonKey.PATH,path);
+        request.put("storageParams",storageParams);
+        String pdfUrl = callPrintService(printServiceReq);
+        String [] arr = pdfUrl.split("/");
+        return "/"+path+arr[arr.length-1];
     }
 
     private static  Map<String,Object> getContext(CertificateExtension certificateExtension, Map<String, Object> qrMap) {
