@@ -7,7 +7,6 @@ public interface JsonKey {
     String KEY_ID = "keyId";
     String SIGN_CREATOR = "SIGN_CREATOR";
     String SIGN_URL = "SIGN_URL";
-    String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
     String DOMAIN_URL = "sunbird_cert_domain_url";
     String BADGE_URL = "BADGE_URL";
@@ -44,27 +43,10 @@ public interface JsonKey {
     String VERIFY = "verify";
     String BASE_PATH = "basePath";
 
-    String ITEXT_LICENSE_ENABLED = "ITEXT_LICENSE_ENABLED";
-    String ITEXT_LICENSE_PATH = "ITEXT_LICENSE_PATH";
-
-    String CLASS = "class";
     String DATA = "data";
-    String EKS = "eks";
-    String LEVEL = "level";
     String MESSAGE = "message";
-    String METHOD = "method";
-    String REQUEST_MESSAGE_ID = "msgId";
-    String STACKTRACE = "stacktrace";
-    String VER = "ver";
-    String OK = "ok";
-    String LOG_LEVEL = "logLevel";
-    String ERROR = "error";
-    String EMPTY_STRING = "";
+    String OK = "ok";;
     String RESPONSE = "response";
-    String ADDRESS = "address";
-    String ERROR_MSG = "error_msg";
-    String ATTRIBUTE = "attribute";
-    String ERRORS = "errors";
     String SUCCESS = "success";
 
     String CERTIFICATE = "certificate";
@@ -78,23 +60,18 @@ public interface JsonKey {
     String DESIGNATION = "designation";
     String SIGNATORY_IMAGE = "image";
 
-    String ASSESSED_DOMAIN = "ASSESSED_DOMAIN";
-    String TEMPLATE_URL = "TEMPLATE_URL";
     String SIGNATORY_EXTENSION = "SIGNATORY_EXTENSION";
     String RECIPIENT_EMAIl = "recipientEmail";
     String RECIPIENT_PHONE = "recipientPhone";
     String RECIPIENT_ID = "recipientId";
     String VALID_FROM = "validFrom";
     String EXPIRY = "expiry";
-    String OLD_ID = "oldId";
     String PUBLIC_KEY = "publicKey";
     String DESCRIPTION = "description";
     String LOGO = "logo";
     String ISSUE_DATE = "issuedDate";
-    String USER = "user";
     String CERTIFICATE_NAME = "name";
 
-    String ORG_ID = "orgId";
     String KEYS = "keys";
     String JSON_URL = "jsonUrl";
     String PDF_URL = "pdfUrl";

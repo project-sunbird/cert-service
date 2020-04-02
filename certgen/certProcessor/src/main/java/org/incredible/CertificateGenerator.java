@@ -11,19 +11,17 @@ import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
+import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
-import org.incredible.certProcessor.views.PdfGenerator;
 import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.CertificateResponse;
-import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
 import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.FontFormatException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -120,7 +118,8 @@ public class CertificateGenerator {
         CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
         StoreConfig storeParams = new StoreConfig(getStorageParamsFromEnv());
         ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
-        String qrImageUrl = FileUploader.uploadCertificate(qrCodeFile,certStore,certStoreFactory.setCloudPath(storeParams));
+        certStore.init();
+        String qrImageUrl = certStore.saveFile(qrCodeFile, certStoreFactory.setCloudPath(storeParams));
         logger.info("Qrcode {} is created for the certificate", qrCodeFile.getName());
         return qrImageUrl;
     }
