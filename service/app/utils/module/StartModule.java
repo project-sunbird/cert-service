@@ -13,8 +13,8 @@ import utils.ApplicationStart;
 public class StartModule extends AbstractModule {
 	@Override
 	protected void configure() {
+		bind(SignalHandler.class).asEagerSingleton();
 		bind(ApplicationStart.class).asEagerSingleton();
-
 	}
 
 }
