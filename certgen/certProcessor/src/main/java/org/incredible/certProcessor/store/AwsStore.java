@@ -8,6 +8,7 @@ import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * used to upload or downloads files to aws
@@ -20,39 +21,41 @@ public class AwsStore extends CloudStore {
 
     private BaseStorageService storageService = null;
 
+    private CloudStorage cloudStorage = null;
+
+    private int retryCount = 0;
+
     public AwsStore(StoreConfig awsStoreConfig) {
         this.awsStoreConfig = awsStoreConfig;
+        retryCount = Integer.parseInt(awsStoreConfig.getCloudRetryCount());
+        init();
     }
 
 
     @Override
     public String upload(File file, String path) {
+        String uploadPath = getPath(path);
+        return cloudStorage.uploadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), uploadPath, file, false, retryCount);
+    }
+
+    @Override
+    public void download(String fileName, String localPath) {
+        cloudStorage.downloadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), fileName, localPath, false);
+    }
+
+    private String getPath(String path) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(path);
-        if (StringUtils.isNotBlank(awsStoreConfig.getAwsStoreConfig().getPath())) {
-            stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath() + "/");
+        if (StringUtils.isNotBlank(awsStoreConfig.getAzureStoreConfig().getPath())) {
+            stringBuilder.append(awsStoreConfig.getAzureStoreConfig().getPath() + "/");
         }
-        CloudStorage cloudStorage = new CloudStorage(storageService);
-        int retryCount = Integer.parseInt(awsStoreConfig.getCloudRetryCount());
-        return cloudStorage.uploadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), stringBuilder.toString(), file, false, retryCount);
+        return stringBuilder.toString();
     }
 
     @Override
-    public String uploadFile(File file, String uploadPath) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(uploadPath);
-        if (StringUtils.isNotBlank(awsStoreConfig.getAwsStoreConfig().getPath())) {
-            stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath() + "/");
-        }
-        CloudStorage cloudStorage = new CloudStorage(storageService);
-        int retryCount = Integer.parseInt(awsStoreConfig.getCloudRetryCount());
-        return cloudStorage.upload(awsStoreConfig.getAwsStoreConfig().getContainerName(), stringBuilder.toString(), file, false, retryCount);
-    }
-
-    @Override
-    public void download(String fileName, String localPath) throws StorageServiceException {
-        CloudStorage cloudStorage = new CloudStorage(storageService);
-        cloudStorage.downloadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), fileName, localPath, false);
+    public String getPrivateLink(File file, String uploadPath) {
+        String path = getPath(uploadPath);
+        return cloudStorage.upload(awsStoreConfig.getAwsStoreConfig().getContainerName(), path, file, false, retryCount);
     }
 
     @Override
@@ -63,6 +66,7 @@ public class AwsStore extends CloudStore {
             StorageConfig storageConfig = new StorageConfig(awsStoreConfig.getType(), storageKey, storageSecret);
             logger.info("StorageParams:init:all storage params initialized for aws block");
             storageService = StorageServiceFactory.getStorageService(storageConfig);
+            cloudStorage = new CloudStorage(storageService);
         } else {
             logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(awsStoreConfig.getType()));
         }
