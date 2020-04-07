@@ -1,4 +1,4 @@
-package org.incredible.pojos;
+package org.sunbird.response;
 
 public class CertificateResponse {
     private String uuid;

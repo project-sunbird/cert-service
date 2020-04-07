@@ -184,49 +184,35 @@ public class CertsConstant {
         return Boolean.toString(false);
     }
 
-    public Map<String, Object> getStorageParamsFromEvn(String storageType) {
+    public Map<String, Object> getStorageParamsFromEvn() {
         logger.info("getting storage params from env");
         String type = getCloudStorageType();
         Map<String, Object> storeParams = new HashMap<>();
         storeParams.put(JsonKey.TYPE, type);
         if (StringUtils.isNotBlank(type)) {
             if (type.equals(JsonKey.AZURE)) {
-                storeParams.put(JsonKey.AZURE, getAzureParams(storageType));
+                storeParams.put(JsonKey.AZURE, getAzureParams());
             }
             if (type.equals(JsonKey.AWS)) {
-                storeParams.put(JsonKey.AWS, getAwsParams(storageType));
+                storeParams.put(JsonKey.AWS, getAwsParams());
             }
         }
         return storeParams;
     }
 
-    private Map<String, String> getAzureParams(String storageType) {
+    private Map<String, String> getAzureParams() {
         Map<String, String> azureParams = new HashMap<>();
-        if (JsonKey.PRIVATE.equalsIgnoreCase(storageType)) {
-            azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
-            azureParams.put(JsonKey.ACCOUNT, getAzureStorageKey());
-            azureParams.put(JsonKey.KEY, getAzureStorageSecret());
-        } else {
-            // For public container
-            azureParams.put(JsonKey.containerName, getPropertyFromEnv(JsonKey.PUBLIC_CONTAINER_NAME));
-            azureParams.put(JsonKey.ACCOUNT, getPropertyFromEnv(JsonKey.PUBLIC_AZURE_STORAGE_KEY));
-            azureParams.put(JsonKey.KEY, getPropertyFromEnv(JsonKey.PUBLIC_AZURE_STORAGE_SECRET));
-        }
+        azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        azureParams.put(JsonKey.ACCOUNT, getAzureStorageKey());
+        azureParams.put(JsonKey.KEY, getAzureStorageSecret());
         return azureParams;
     }
 
-    private Map<String, String> getAwsParams(String storageType) {
+    private Map<String, String> getAwsParams() {
         Map<String, String> awsParams = new HashMap<>();
-        if (JsonKey.PRIVATE.equalsIgnoreCase(storageType)) {
-            awsParams.put(JsonKey.containerName, getCONTAINER_NAME());
-            awsParams.put(JsonKey.ACCOUNT, getAwsStorageKey());
-            awsParams.put(JsonKey.KEY, getAwsStorageSecret());
-        } else {
-            // For public container
-            awsParams.put(JsonKey.containerName, getPropertyFromEnv(JsonKey.PUBLIC_CONTAINER_NAME));
-            awsParams.put(JsonKey.ACCOUNT, getPropertyFromEnv(JsonKey.PUBLIC_AWS_STORAGE_KEY));
-            awsParams.put(JsonKey.KEY, getPropertyFromEnv(JsonKey.PUBLIC_AWS_STORAGE_SECRET));
-        }
+        awsParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        awsParams.put(JsonKey.ACCOUNT, getAwsStorageKey());
+        awsParams.put(JsonKey.KEY, getAwsStorageSecret());
         return awsParams;
     }
 }

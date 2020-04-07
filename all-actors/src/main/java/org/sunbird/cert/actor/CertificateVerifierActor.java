@@ -141,7 +141,7 @@ public class CertificateVerifierActor extends BaseActor {
      * @throws BaseException
      */
     private Map<String, Object> downloadCert(String url) throws IOException, BaseException {
-        StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn(JsonKey.PRIVATE));
+        StoreConfig storeConfig = new StoreConfig(certsConstant.getStorageParamsFromEvn());
         CertStoreFactory certStoreFactory = new CertStoreFactory(null);
         ICertStore certStore = certStoreFactory.getCloudStore(storeConfig);
         certStore.init();
