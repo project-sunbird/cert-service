@@ -1,0 +1,195 @@
+package org.incredible.certProcessor.views;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang.StringUtils;
+import org.incredible.certProcessor.store.ICertStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+/**
+ * Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
+ */
+public class HTMLTemplateZip {
+
+
+
+    private static Logger logger = LoggerFactory.getLogger(HTMLTemplateZip.class);
+
+    /**
+     * html zip file url (relative path (uri) of container based url or pubic http url)
+     */
+    private String zipUrl;
+
+    private ICertStore htmlTemplateStore;
+
+    private String zipFilePath = "conf/";
+
+    private String zipFileName = "";
+
+    private String targetDir = "";
+
+    public HTMLTemplateZip(ICertStore htmlTemplateStore, String zipUrl) {
+        this.htmlTemplateStore = htmlTemplateStore;
+        this.zipUrl = zipUrl;
+    }
+
+
+    public void init() {
+        this.zipFileName = this.getZipFileName();
+        this.targetDir = "conf/" + StringUtils.substringBefore(zipFileName, ".zip");
+    }
+
+    /**
+     * unzips zip file
+     */
+    public void unzip() {
+        File dir = new File(targetDir);
+        // create output directory if it doesn't exist
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(zipFilePath + zipFileName);
+            ZipInputStream zipIn = new ZipInputStream(fis);
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null) {
+                String filePath = targetDir + File.separator + entry.getName();
+                if (!entry.isDirectory()) {
+                    // if the entry is a file, extracts it
+                    extractFile(zipIn, filePath);
+                } else {
+                    // if the entry is a directory, make the directory
+                    File subDir = new File(filePath);
+                    subDir.mkdir();
+                }
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+            zipIn.close();
+            fis.close();
+            logger.info("Unzipping zip file is finished");
+        } catch (IOException e) {
+            logger.debug("Exception while unzip file {}", e.getMessage());
+        }
+
+    }
+
+    /**
+     * extracts each files in zip file (zip entry)
+     *
+     * @param zipIn
+     * @param filePath
+     * @throws IOException
+     */
+    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        byte[] bytesIn = new byte[4096];
+        int read = 0;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            bos.write(bytesIn, 0, read);
+        }
+        bos.close();
+    }
+
+
+    /**
+     * used to get file name from the url
+     *
+     * @return zip file name
+     */
+    public String getZipFileName() {
+        String fileName = null;
+        try {
+            URI uri = new URI(zipUrl);
+            String path = uri.getPath();
+            fileName = path.substring(path.lastIndexOf('/') + 1);
+            if (!fileName.endsWith(".zip"))
+                return fileName.concat(".zip");
+        } catch (URISyntaxException e) {
+            logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
+        }
+        return fileName;
+    }
+
+
+
+    public Boolean isIndexHTMlFileExits() {
+        boolean isExits = false;
+        File file = new File(this.targetDir + "/index.html");
+        if (file.exists()) {
+            isExits = true;
+        } else {
+            isExits = false;
+        }
+        return isExits;
+    }
+
+    public String getTemplateContent() throws IOException {
+        File targetDirectory = new File(targetDir);
+        String htmlFileName = "/index.html";
+        FileInputStream fis = new FileInputStream(targetDirectory.getAbsolutePath() + htmlFileName);
+        String content = IOUtils.toString(fis, StandardCharsets.UTF_8);
+        fis.close();
+        return  content;
+    }
+
+    public void download() throws IOException, StorageServiceException {
+        htmlTemplateStore.init();
+        htmlTemplateStore.get(zipUrl, zipFileName, zipFilePath);
+    }
+
+
+    /**
+     * to check file is  exists or not
+     *
+     * @return
+     */
+    public Boolean isZipFileExists() {
+        boolean isExits = false;
+        File file = new File(zipFilePath + zipFileName);
+        if (file.exists()) {
+            isExits = true;
+        } else {
+            isExits = false;
+        }
+        return isExits;
+    }
+
+    public void cleanUp() {
+        Boolean isDeleted = false;
+        String fileName = StringUtils.substringBefore(zipFileName, ".zip");
+        try {
+            if (StringUtils.isNotBlank(fileName)) {
+                File directory = new File(zipFilePath);
+                Collection<File> files = FileUtils.listFiles(directory, new WildcardFileFilter(fileName + ".*"), null);
+                Iterator iterator = files.iterator();
+                while (iterator.hasNext()) {
+                    File file = (File) iterator.next();
+                    isDeleted = file.delete();
+                }
+                logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+
+}

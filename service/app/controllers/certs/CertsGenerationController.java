@@ -49,4 +49,11 @@ public class CertsGenerationController  extends BaseController{
                 CertActorOperation.VERIFY_CERT.getOperation());
         return response;
     }
+
+    public CompletionStage<Result> validateTemplate() {
+        CompletionStage<Result> response = handleRequest(request(),
+                null,
+                CertActorOperation.VALIDATE_TEMPLATE.getOperation());
+        return response;
+    }
 }
