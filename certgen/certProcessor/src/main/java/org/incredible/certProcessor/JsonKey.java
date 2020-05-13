@@ -1,6 +1,5 @@
 package org.incredible.certProcessor;
 
-import sun.java2d.pipe.SolidTextRenderer;
 
 public interface JsonKey {
 
