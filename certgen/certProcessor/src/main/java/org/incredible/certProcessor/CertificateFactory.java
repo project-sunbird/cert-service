@@ -43,6 +43,7 @@ public class CertificateFactory {
         IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
         SignatureBuilder signatureBuilder = new SignatureBuilder();
+        TrainingEvidenceBuilder trainingEvidenceBuilder = new TrainingEvidenceBuilder(properties.get(JsonKey.CONTEXT));
 
 
         /**
@@ -60,11 +61,18 @@ public class CertificateFactory {
          * badge class object
          * **/
 
-        badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
+        badgeClassBuilder.setName(certModel.getCertificateName()).setDescription(certModel.getCertificateDescription())
                 .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(certModel.getCriteria())
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
+        /**
+         * Training evidence
+         */
+        if (StringUtils.isNotBlank(certModel.getCourseName())) {
+            trainingEvidenceBuilder.setId(uuid).setName(certModel.getCourseName());
+            certificateExtensionBuilder.setEvidence(trainingEvidenceBuilder.build());
+        }
 
         /**
          *
@@ -110,12 +118,12 @@ public class CertificateFactory {
     public boolean verifySignature(JsonNode certificate, String signatureValue, String encServiceUrl, String creator) throws SignatureException.UnreachableException, SignatureException.VerificationException {
         boolean isValid = false;
         SignatureHelper signatureHelper = new SignatureHelper(encServiceUrl);
-            Map<String, Object> signReq = new HashMap<>();
-            signReq.put(JsonKey.CLAIM, certificate);
-            signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
-            signReq.put(JsonKey.KEY_ID, getKeyId(creator));
-            JsonNode jsonNode = mapper.valueToTree(signReq);
-            isValid = signatureHelper.verifySignature(jsonNode);
+        Map<String, Object> signReq = new HashMap<>();
+        signReq.put(JsonKey.CLAIM, certificate);
+        signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
+        signReq.put(JsonKey.KEY_ID, getKeyId(creator));
+        JsonNode jsonNode = mapper.valueToTree(signReq);
+        isValid = signatureHelper.verifySignature(jsonNode);
         return isValid;
     }
 
