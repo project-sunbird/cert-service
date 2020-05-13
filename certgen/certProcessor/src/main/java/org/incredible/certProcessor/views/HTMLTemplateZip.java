@@ -2,7 +2,6 @@ package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.store.ICertStore;
 import org.slf4j.Logger;
@@ -17,22 +16,19 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
+ * Downloads zip file and unzips
  */
 public class HTMLTemplateZip {
-
 
 
     private static Logger logger = LoggerFactory.getLogger(HTMLTemplateZip.class);
 
     /**
-     * html zip file url (relative path (uri) of container based url or pubic http url)
+     * template zip file url
      */
     private String zipUrl;
 
@@ -40,9 +36,9 @@ public class HTMLTemplateZip {
 
     private String zipFilePath = "conf/";
 
-    private String zipFileName = "";
+    private String zipFileName;
 
-    private String targetDir = "";
+    private String targetDir;
 
     public HTMLTemplateZip(ICertStore htmlTemplateStore, String zipUrl) {
         this.htmlTemplateStore = htmlTemplateStore;
@@ -52,7 +48,8 @@ public class HTMLTemplateZip {
 
     public void init() {
         this.zipFileName = this.getZipFileName();
-        this.targetDir = "conf/" + StringUtils.substringBefore(zipFileName, ".zip");
+        //target directory to unzip the zip file
+        this.targetDir = zipFilePath + StringUtils.substringBefore(zipFileName, ".zip");
     }
 
     /**
@@ -115,7 +112,7 @@ public class HTMLTemplateZip {
      *
      * @return zip file name
      */
-    public String getZipFileName() {
+    private String getZipFileName() {
         String fileName = null;
         try {
             URI uri = new URI(zipUrl);
@@ -124,7 +121,7 @@ public class HTMLTemplateZip {
             if (!fileName.endsWith(".zip"))
                 return fileName.concat(".zip");
         } catch (URISyntaxException e) {
-            logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
+            logger.debug("Exception while getting file name from template url : {}", e.getMessage());
         }
         return fileName;
     }
@@ -132,7 +129,7 @@ public class HTMLTemplateZip {
 
 
     public Boolean isIndexHTMlFileExits() {
-        boolean isExits = false;
+        boolean isExits;
         File file = new File(this.targetDir + "/index.html");
         if (file.exists()) {
             isExits = true;
@@ -148,22 +145,31 @@ public class HTMLTemplateZip {
         FileInputStream fis = new FileInputStream(targetDirectory.getAbsolutePath() + htmlFileName);
         String content = IOUtils.toString(fis, StandardCharsets.UTF_8);
         fis.close();
-        return  content;
+        return content;
     }
 
     public void download() throws IOException, StorageServiceException {
+        checkDirectoryExists();
         htmlTemplateStore.init();
         htmlTemplateStore.get(zipUrl, zipFileName, zipFilePath);
     }
 
 
+    private void checkDirectoryExists() {
+        File file = new File(zipFilePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+    }
+
+
     /**
-     * to check file is  exists or not
+     * to check zip file is exists or not
      *
      * @return
      */
     public Boolean isZipFileExists() {
-        boolean isExits = false;
+        boolean isExits;
         File file = new File(zipFilePath + zipFileName);
         if (file.exists()) {
             isExits = true;
@@ -173,23 +179,20 @@ public class HTMLTemplateZip {
         return isExits;
     }
 
+    /**
+     * deletes downloaded zip file and unzipped directory
+     */
     public void cleanUp() {
-        Boolean isDeleted = false;
-        String fileName = StringUtils.substringBefore(zipFileName, ".zip");
+        String dirName = StringUtils.substringBefore(zipFileName, ".zip");
+        File directory = new File(zipFilePath + dirName);
         try {
-            if (StringUtils.isNotBlank(fileName)) {
-                File directory = new File(zipFilePath);
-                Collection<File> files = FileUtils.listFiles(directory, new WildcardFileFilter(fileName + ".*"), null);
-                Iterator iterator = files.iterator();
-                while (iterator.hasNext()) {
-                    File file = (File) iterator.next();
-                    isDeleted = file.delete();
-                }
-                logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
-            }
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            FileUtils.deleteDirectory(directory);
+        } catch (IOException e) {
+            logger.info("Exception while deleting directory  " + directory.getName() + " " + e.getMessage());
         }
+        File zipFile = new File(zipFilePath + zipFileName);
+        zipFile.delete();
+        logger.info("HTMLTemplateZip: cleanUp completed");
     }
 
 }

@@ -8,6 +8,7 @@ import org.incredible.certProcessor.views.HTMLTemplateValidator;
 import org.incredible.certProcessor.views.HTMLTemplateZip;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
+import org.sunbird.CertsConstant;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
@@ -16,9 +17,12 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Set;
 
 /**
- * This actor is responsible for certificate verification.
+ * @author Aishwarya
+ * This actor is responsible for Template validation
  */
 @ActorConfig(
         tasks = {JsonKey.VALIDATE_TEMPLATE},
@@ -27,6 +31,7 @@ import java.io.IOException;
 public class TemplateValidateActor extends BaseActor {
 
     private Logger logger = Logger.getLogger(TemplateValidateActor.class);
+    private CertsConstant certsConstant = new CertsConstant();
 
     @Override
     public void onReceive(Request request) throws Throwable {
@@ -39,54 +44,58 @@ public class TemplateValidateActor extends BaseActor {
 
 
     private void validateTemplate(Request request) throws BaseException {
-        String templateUrl = (String) request.getRequest().get(JsonKey.TEMPLATE_URL);
-        HTMLTemplateZip htmlTemplateZip = new HTMLTemplateZip(new LocalStore(null), templateUrl);
-        htmlTemplateZip.init();
         HTMLValidatorResponse validatorResponse;
+        String templateUrl = (String) request.getRequest().get(JsonKey.TEMPLATE_URL);
+        HTMLTemplateZip htmlTemplateZip = new HTMLTemplateZip(new LocalStore(certsConstant.getDOMAIN_URL()), templateUrl);
+        htmlTemplateZip.init();
 
         //download the file
-
         try {
             htmlTemplateZip.download();
         } catch (StorageServiceException | IOException e) {
-            logger.info("expec downloading" + e.getMessage());
+            logger.info("exception while downloading " + e.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
-        //check if zip file downloaded or not if downloaded unzip
-
+        //check if zip file downloaded or not ,if downloaded unzip
         if (htmlTemplateZip.isZipFileExists()) {
             htmlTemplateZip.unzip();
             if (htmlTemplateZip.isIndexHTMlFileExits()) {
                 validatorResponse = validateHtml(htmlTemplateZip);
             } else {
-                throw new BaseException(IResponseMessage.INTERNAL_ERROR, "zip file format is wrong , as we cound'nt find index.html file", ResponseCode.SERVER_ERROR.getCode());
+                htmlTemplateZip.cleanUp();
+                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
             }
-
         } else {
-            throw new BaseException(IResponseMessage.INTERNAL_ERROR, "zip file in the url does not exist", ResponseCode.SERVER_ERROR.getCode());
+            htmlTemplateZip.cleanUp();
+            throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
         }
+
         htmlTemplateZip.cleanUp();
         Response response = new Response();
         response.getResult().put("response", validatorResponse);
-
         sender().tell(response, getSelf());
-        logger.info("onReceive method call End" + response.toString());
+        logger.info("onReceive method call End");
     }
 
     private HTMLValidatorResponse validateHtml(HTMLTemplateZip htmlTemplateZip) {
         HTMLValidatorResponse validatorResponse = new HTMLValidatorResponse();
+        String htmlContent;
         try {
-            String content = htmlTemplateZip.getTemplateContent();
-            HTMLTemplateValidator htmlTemplateValidator = new HTMLTemplateValidator(content);
-            Boolean isValid = htmlTemplateValidator.validate();
-            validatorResponse.setValid(isValid);
-
-        } catch (Exception e) {
-            validatorResponse.setValid(false);
-            validatorResponse.setErrMessage(e.getMessage());
+            htmlContent = htmlTemplateZip.getTemplateContent();
+            HTMLTemplateValidator htmlTemplateValidator = new HTMLTemplateValidator(htmlContent);
+            Set<String> invalidVars = htmlTemplateValidator.validate();
+            if (invalidVars.isEmpty()) {
+                logger.info("template is valid");
+                validatorResponse.setValid(true);
+            } else {
+                validatorResponse.setValid(false);
+                validatorResponse.setMessage(invalidVars);
+                logger.info("template is invalid " + invalidVars);
+            }
+        } catch (IOException e) {
+            logger.info(e.getMessage());
         }
         return validatorResponse;
     }
-
 
 }
