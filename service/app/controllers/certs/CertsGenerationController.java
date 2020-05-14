@@ -51,12 +51,13 @@ public class CertsGenerationController  extends BaseController{
     }
 
     public CompletionStage<Result> validateTemplate() {
-		return  handleRequest(request(),
+		CompletionStage<Result> response =  handleRequest(request(),
 				request -> {
 					Request req = (Request) request;
 					new TemplateReqValidator().validateTemplateRequest(req);
 					return null;
 				},
                 CertActorOperation.VALIDATE_TEMPLATE.getOperation());
+		return response;
     }
 }
