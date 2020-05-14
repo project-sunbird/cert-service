@@ -55,17 +55,16 @@ public class HTMLTemplateZip {
     /**
      * unzips zip file
      */
-    public void unzip() {
+    public void unzip() throws IOException {
         File dir = new File(targetDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        FileInputStream fis;
+        FileInputStream fis = new FileInputStream(zipFilePath + zipFileName);
+        ZipInputStream zipIn = new ZipInputStream(fis);
+        ZipEntry entry = zipIn.getNextEntry();
         try {
-            fis = new FileInputStream(zipFilePath + zipFileName);
-            ZipInputStream zipIn = new ZipInputStream(fis);
-            ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null) {
                 String filePath = targetDir + File.separator + entry.getName();
@@ -80,11 +79,10 @@ public class HTMLTemplateZip {
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
             }
+            logger.info("Unzipping zip file is finished");
+        } finally {
             zipIn.close();
             fis.close();
-            logger.info("Unzipping zip file is finished");
-        } catch (IOException e) {
-            logger.debug("Exception while unzip file {}", e.getMessage());
         }
 
     }
@@ -97,13 +95,16 @@ public class HTMLTemplateZip {
      * @throws IOException
      */
     private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
-        byte[] bytesIn = new byte[4096];
-        int read = 0;
-        while ((read = zipIn.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(filePath));
+        try {
+            byte[] bytesIn = new byte[4096];
+            int read = 0;
+            while ((read = zipIn.read(bytesIn)) != -1) {
+                bufferedOutputStream.write(bytesIn, 0, read);
+            }
+        } finally {
+            bufferedOutputStream.close();
         }
-        bos.close();
     }
 
 

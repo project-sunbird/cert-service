@@ -56,21 +56,27 @@ public class TemplateValidateActor extends BaseActor {
             logger.info("exception while downloading " + e.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
+
         //check if zip file downloaded or not ,if downloaded unzip
         if (htmlTemplateZip.isZipFileExists()) {
-            htmlTemplateZip.unzip();
-            if (htmlTemplateZip.isIndexHTMlFileExits()) {
-                validatorResponse = validateHtml(htmlTemplateZip);
-            } else {
+            try {
+                htmlTemplateZip.unzip();
+                if (htmlTemplateZip.isIndexHTMlFileExits()) {
+                    validatorResponse = validateHtml(htmlTemplateZip);
+                } else {
+                    throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
+                }
+            } catch (IOException e) {
+                logger.info("exception while unzipping " + e.getMessage());
+                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, " exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
+            } finally {
                 htmlTemplateZip.cleanUp();
-                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
             }
         } else {
             htmlTemplateZip.cleanUp();
             throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
         }
 
-        htmlTemplateZip.cleanUp();
         Response response = new Response();
         response.getResult().put("response", validatorResponse);
         sender().tell(response, getSelf());
@@ -90,7 +96,7 @@ public class TemplateValidateActor extends BaseActor {
             } else {
                 validatorResponse.setValid(false);
                 validatorResponse.setMessage(invalidVars);
-                logger.info("template is invalid " + invalidVars);
+                logger.info("template is invalid , it contains invalid variables : " + invalidVars);
             }
         } catch (IOException e) {
             logger.info(e.getMessage());
