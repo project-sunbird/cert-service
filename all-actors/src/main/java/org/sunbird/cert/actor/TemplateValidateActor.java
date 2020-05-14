@@ -47,7 +47,6 @@ public class TemplateValidateActor extends BaseActor {
         HTMLValidatorResponse validatorResponse;
         String templateUrl = (String) request.getRequest().get(JsonKey.TEMPLATE_URL);
         HTMLTemplateZip htmlTemplateZip = new HTMLTemplateZip(new LocalStore(certsConstant.getDOMAIN_URL()), templateUrl);
-        htmlTemplateZip.init();
 
         //download the file
         try {
@@ -58,17 +57,17 @@ public class TemplateValidateActor extends BaseActor {
         }
 
         //check if zip file downloaded or not ,if downloaded unzip
-        if (htmlTemplateZip.isZipFileExists()) {
+        if (Boolean.TRUE.equals(htmlTemplateZip.isZipFileExists())) {
             try {
                 htmlTemplateZip.unzip();
-                if (htmlTemplateZip.isIndexHTMlFileExits()) {
+                if (Boolean.TRUE.equals(htmlTemplateZip.isIndexHTMlFileExits())) {
                     validatorResponse = validateHtml(htmlTemplateZip);
                 } else {
                     throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
                 }
             } catch (IOException e) {
                 logger.info("exception while unzipping " + e.getMessage());
-                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, " exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
+                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
             } finally {
                 htmlTemplateZip.cleanUp();
             }

@@ -43,6 +43,7 @@ public class HTMLTemplateZip {
     public HTMLTemplateZip(ICertStore htmlTemplateStore, String zipUrl) {
         this.htmlTemplateStore = htmlTemplateStore;
         this.zipUrl = zipUrl;
+        this.init();
     }
 
 
@@ -63,8 +64,8 @@ public class HTMLTemplateZip {
         }
         FileInputStream fis = new FileInputStream(zipFilePath + zipFileName);
         ZipInputStream zipIn = new ZipInputStream(fis);
-        ZipEntry entry = zipIn.getNextEntry();
         try {
+            ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null) {
                 String filePath = targetDir + File.separator + entry.getName();
@@ -128,7 +129,6 @@ public class HTMLTemplateZip {
     }
 
 
-
     public Boolean isIndexHTMlFileExits() {
         boolean isExits;
         File file = new File(this.targetDir + "/index.html");
@@ -141,11 +141,15 @@ public class HTMLTemplateZip {
     }
 
     public String getTemplateContent() throws IOException {
+        String htmlFileName = "index.html";
         File targetDirectory = new File(targetDir);
-        String htmlFileName = "/index.html";
-        FileInputStream fis = new FileInputStream(targetDirectory.getAbsolutePath() + htmlFileName);
-        String content = IOUtils.toString(fis, StandardCharsets.UTF_8);
-        fis.close();
+        FileInputStream fis = new FileInputStream(targetDirectory.getAbsolutePath() + "/" +  htmlFileName);
+        String content;
+        try {
+            content = IOUtils.toString(fis, StandardCharsets.UTF_8);
+        } finally {
+            fis.close();
+        }
         return content;
     }
 
