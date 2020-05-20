@@ -53,6 +53,10 @@ public class HTMLTemplateZip {
         this.targetDir = zipFilePath + StringUtils.substringBefore(zipFileName, ".zip");
     }
 
+    public String getTemplateUrl() {
+        return zipUrl;
+    }
+
     /**
      * unzips zip file
      */

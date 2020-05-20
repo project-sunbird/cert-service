@@ -48,32 +48,27 @@ public class TemplateValidateActor extends BaseActor {
         String templateUrl = (String) request.getRequest().get(JsonKey.TEMPLATE_URL);
         HTMLTemplateZip htmlTemplateZip = new HTMLTemplateZip(new LocalStore(certsConstant.getDOMAIN_URL()), templateUrl);
 
-        //download the file
         try {
-            htmlTemplateZip.download();
-        } catch (StorageServiceException | IOException e) {
-            logger.info("exception while downloading " + e.getMessage());
-            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
-        }
-
-        //check if zip file downloaded or not ,if downloaded unzip
-        if (Boolean.TRUE.equals(htmlTemplateZip.isZipFileExists())) {
-            try {
+            htmlTemplateZip.download(); //download the file
+            //check if zip file downloaded or not ,if downloaded unzip
+            if (Boolean.TRUE.equals(htmlTemplateZip.isZipFileExists())) {
                 htmlTemplateZip.unzip();
                 if (Boolean.TRUE.equals(htmlTemplateZip.isIndexHTMlFileExits())) {
                     validatorResponse = validateHtml(htmlTemplateZip);
                 } else {
                     throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
                 }
-            } catch (IOException e) {
-                logger.info("exception while unzipping " + e.getMessage());
-                throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
-            } finally {
-                htmlTemplateZip.cleanUp();
+            } else {
+                throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
             }
-        } else {
+        } catch (StorageServiceException e) {
+            logger.info("exception while downloading " + e.getMessage());
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+        } catch (IOException e) {
+            logger.info("exception while unzipping " + e.getMessage());
+            throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
+        } finally {
             htmlTemplateZip.cleanUp();
-            throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
         }
 
         Response response = new Response();
@@ -90,12 +85,12 @@ public class TemplateValidateActor extends BaseActor {
             HTMLTemplateValidator htmlTemplateValidator = new HTMLTemplateValidator(htmlContent);
             Set<String> invalidVars = htmlTemplateValidator.validate();
             if (invalidVars.isEmpty()) {
-                logger.info("template is valid");
+                logger.info(String.format("given template %s is valid", htmlTemplateZip.getTemplateUrl()));
                 validatorResponse.setValid(true);
             } else {
                 validatorResponse.setValid(false);
                 validatorResponse.setMessage(invalidVars);
-                logger.info("template is invalid , it contains invalid variables : " + invalidVars);
+                logger.info(String.format("given template %s is invalid , it contains invalid variables : %s ", htmlTemplateZip.getTemplateUrl(), invalidVars));
             }
         } catch (IOException e) {
             logger.info(e.getMessage());
