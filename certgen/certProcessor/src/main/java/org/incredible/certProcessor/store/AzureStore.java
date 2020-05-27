@@ -2,7 +2,8 @@ package org.incredible.certProcessor.store;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
@@ -14,7 +15,7 @@ import java.io.File;
 
 public class AzureStore extends CloudStore {
 
-    private Logger logger = Logger.getLogger(AzureStore.class);
+    private Logger logger = LoggerFactory.getLogger(AzureStore.class);
 
     private StoreConfig azureStoreConfig;
 
