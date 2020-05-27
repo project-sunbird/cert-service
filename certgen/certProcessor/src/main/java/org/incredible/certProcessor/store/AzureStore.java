@@ -4,7 +4,6 @@ package org.incredible.certProcessor.store;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sunbird.cloud.storage.BaseStorageService;
-import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
@@ -12,7 +11,6 @@ import org.sunbird.cloud.storage.factory.StorageServiceFactory;
  * used to upload or download files to the azure
  */
 import java.io.File;
-import java.io.IOException;
 
 public class AzureStore extends CloudStore {
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
@@ -44,7 +43,6 @@ import java.util.Map;
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {
-    private Logger logger = Logger.getLogger(CertificateGeneratorActor.class);
     private static CertsConstant certVar = new CertsConstant();
     private ObjectMapper mapper = new ObjectMapper();
     String directory = "conf/";

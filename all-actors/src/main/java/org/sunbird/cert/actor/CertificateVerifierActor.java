@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.JsonKey;
@@ -47,8 +46,6 @@ import java.util.Map;
         asyncTasks = {}
 )
 public class CertificateVerifierActor extends BaseActor {
-
-    private Logger logger = Logger.getLogger(CertificateVerifierActor.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 
