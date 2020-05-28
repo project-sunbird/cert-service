@@ -61,19 +61,19 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private void generateSignUrl(Request request) {
         try {
-            logger.info("CertificateGeneratorActor:generateSignUrl:generate request got : ".concat(request.getRequest() + ""));
+            logger.info("generateSignUrl:generate pdf sign url request : ".concat(request.getRequest() + ""));
             String uri = UrlManager.getContainerRelativePath((String) request.getRequest().get(JsonKey.PDF_URL));
-            logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
+            logger.info("generateSignUrl:generate sign url method called for uri: ".concat(uri));
             IStorageService storageService = getStorageService();
             String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
                     Some.apply("r"));
-            logger.info("CertificateGeneratorActor:generateSignUrl:signedUrl got: ".concat(signUrl));
+            logger.info("generateSignUrl:signedUrl got: ".concat(signUrl));
             Response response = new Response();
             response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
             response.put(JsonKey.SIGNED_URL, signUrl);
             sender().tell(response, self());
         } catch (Exception e) {
-            logger.error("CertificateGeneratorActor:generateSignUrl: error in genrerating sign url " + e);
+            logger.error("generateSignUrl: error in generating sign url " + e);
             Response response = new Response();
             response.put(JsonKey.RESPONSE, "failure");
             response.put(JsonKey.SIGNED_URL, "");
@@ -85,7 +85,7 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private IStorageService getStorageService() {
         StorageConfig storageConfig = new StorageConfig(certVar.getCloudStorageType(), certVar.getAzureStorageKey(), certVar.getAzureStorageSecret());
-        logger.info("CertificateGeneratorActor:getStorageService:storage object formed:".concat(storageConfig.toString()));
+        logger.info("getStorageService:storage object formed:".concat(storageConfig.toString()));
         IStorageService storageService = StorageServiceFactory.getStorageService(storageConfig);
         return storageService;
     }
@@ -129,7 +129,7 @@ public class CertificateGeneratorActor extends BaseActor {
                 certificateResponse.setPdfLink(properties.get(JsonKey.BASE_PATH).concat(certificateResponse.getPdfLink()));
                 certUrlList.add(getResponse(certificateResponse));
             } catch (Exception ex) {
-                logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
+                logger.error("generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
                 certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
@@ -213,7 +213,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
         properties.put(JsonKey.BASE_PATH, certVar.getBasePath());
 
-        logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
+        logger.info("getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
 

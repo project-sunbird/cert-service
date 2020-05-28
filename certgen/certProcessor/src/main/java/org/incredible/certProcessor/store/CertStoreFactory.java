@@ -99,7 +99,7 @@ public class CertStoreFactory {
                     File file = (File) iterator.next();
                     isDeleted = file.delete();
                 }
-                logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
+                logger.info("files cleanUp completed: " + isDeleted);
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
