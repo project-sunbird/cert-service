@@ -41,6 +41,8 @@ public abstract class BaseActor extends UntypedAbstractActor {
             } catch (Exception e) {
                 logger.error("Exception : operation {} : message : {} {}", operation, e.getMessage(), e);
                 onReceiveException(operation, e);
+            } finally {
+                logger.clearMDC();
             }
         } else {
             logger.info(" onReceive called with invalid type of request.");
