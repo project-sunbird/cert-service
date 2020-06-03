@@ -12,8 +12,11 @@ public class PdfConverter {
     public static void convertor(File htmlSource, String certUuid, String directory) {
         File file = new File(directory, certUuid + ".pdf");
         try {
+            //html to pdf convertion using headLess chrome
             HeadlessChromeHtmlToPdfConverter.convert(htmlSource, file);
-            logger.info("Pdf file is created ");
+            //using Itext
+//            ItextHtmlToPdfConverter.convert(htmlSource,file);
+            logger.info("Pdf file is created for the {} ", certUuid);
         }catch (Exception e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
         }
