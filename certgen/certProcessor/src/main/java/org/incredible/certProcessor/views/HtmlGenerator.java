@@ -63,7 +63,6 @@ public class HtmlGenerator {
             }
         }
         createHTMLFile(context, getUUID(certificateExtension.getId()), directory);
-
     }
 
     private String getUUID(String certId) {
@@ -78,7 +77,6 @@ public class HtmlGenerator {
     }
 
     private void createHTMLFile(VelocityContext context, String certUuid, String directory) {
-        long start =  System.currentTimeMillis();
         try {
             File file = new File(directory, certUuid + ".html");
             Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
@@ -86,11 +84,7 @@ public class HtmlGenerator {
             writer.flush();
             writer.close();
             logger.info("html file is created {}", file.getName());
-            logger.info("pdf  generation stated {}", start);
-
             PdfConverter.convertor(file, certUuid, directory);
-            logger.info("pdf  generation ends {}",   System.currentTimeMillis() - start);
-
         } catch (IOException e) {
             logger.error("IO exception while creating html file :{}", e.getMessage());
         }
