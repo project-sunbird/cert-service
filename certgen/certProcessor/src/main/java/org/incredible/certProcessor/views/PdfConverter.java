@@ -12,9 +12,8 @@ public class PdfConverter {
 
     public static void convertor(File sourceFile, String certUuid, String directory) {
         File file = new File(directory, certUuid + ".pdf");
-//        File file = new File(directory, certUuid + "cert.png");
-//        File file = new File(directory, certUuid + ".jpeg");
-
+//      File file = new File(directory, certUuid + "cert.png");
+//      File file = new File(directory, certUuid + ".jpeg");
         try {
             //html to pdf convertion using headLess chrome
             HeadlessChromeHtmlToPdfConverter.convert(sourceFile, file);
@@ -30,8 +29,6 @@ public class PdfConverter {
 
             //svg to jpeg
 //            BatikSvgToJpegConverter.convert(sourceFile.getAbsolutePath(), file);
-
-
             logger.info("Pdf file is created for the {} ", certUuid);
         } catch (Exception e) {
             logger.error("exception while generating pdf file {}", e.getMessage());

@@ -28,7 +28,6 @@ public class BatikSvgToJpegConverter {
             TranscoderInput transcoderInput = new TranscoderInput(svgURIInput);
             TranscoderOutput transcoderOutput = new TranscoderOutput(outputStream);
             jpegTranscoder.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, 593.00f);
-//            jpegTranscoder.addTranscodingHint(JPEGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 0.5645833f);
             jpegTranscoder.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, 841.50f);
             // KEY_QUALITY 0-1.0 with 1.0 being No Loss.  Value must be of type Float.  0.95 is 30% smaller and looks great.
             jpegTranscoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 1.0f);
@@ -39,9 +38,9 @@ public class BatikSvgToJpegConverter {
         }
     }
 
-    public static void main(String[] args) throws TranscoderException, IOException {
-        convert("/Users/aishwarya/workspace/cert-service/service/conf/0125450863553740809_File-01303624021545779237/cert.svg", new File("test.jpeg"));
-    }
+//    public static void main(String[] args) throws TranscoderException, IOException {
+//        convert("/Users/aishwarya/workspace/cert-service/service/conf/0125450863553740809_File-01303624021545779237/cert.svg", new File("cert.jpeg"));
+//    }
 
 }
 

@@ -33,7 +33,7 @@ public class BatikSvgToPdfConverter {
             pdfTranscoder.addTranscodingHint(PDFTranscoder.KEY_HEIGHT, 593.00f);
             pdfTranscoder.addTranscodingHint(PDFTranscoder.KEY_WIDTH, 841.50f);
             pdfTranscoder.addTranscodingHint(PDFTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, (25.4f / 72f));
-//            pdfTranscoder.addTranscodingHint(PDFTranscoder.KEY_PIXEL_TO_MM, new Float(0.2645833f));
+//          pdfTranscoder.addTranscodingHint(PDFTranscoder.KEY_PIXEL_TO_MM, new Float(0.2645833f));
 
             pdfTranscoder.transcode(input, output);
             logger.info("batik svg to pdf end time{}", System.currentTimeMillis() - startTime);
@@ -41,8 +41,4 @@ public class BatikSvgToPdfConverter {
             outputStream.close();
         }
     }
-
-//           public static void main(String[] argv) throws TranscoderException, IOException {
-//                convert(new File("/Users/aishwarya/workspace/cert-service/service/conf/0125450863553740809_iGot-SVG/cert.svg"), new File("/Users/aishwarya/workspace/cert-service/service/conf/iGot-SVG1/cert.pdf"));
-//    }
 }
