@@ -134,9 +134,9 @@ public class CertificateGeneratorActor extends BaseActor {
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
                 certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
-                certStore.close();
             }
         }
+        certStore.close();
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
