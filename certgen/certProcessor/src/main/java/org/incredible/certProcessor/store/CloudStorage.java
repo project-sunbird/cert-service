@@ -50,7 +50,6 @@ public class CloudStorage {
     }
 
     public void closeConnection(){
-        logger.info("Release the connection");
         storageService.closeContext();
     }
 }
