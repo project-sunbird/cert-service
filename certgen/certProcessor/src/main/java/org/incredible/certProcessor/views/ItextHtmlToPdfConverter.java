@@ -20,8 +20,7 @@ public class ItextHtmlToPdfConverter {
     public static void convert(File htmlSource, File pdfFile) {
         try {
             LicenseKey.loadLicenseFile("conf/itextkey1593594576874_0.xml");
-            ConverterProperties converterProperties = new ConverterProperties();
-            HtmlConverter.convertToPdf(htmlSource, pdfFile, converterProperties);
+            HtmlConverter.convertToPdf(htmlSource, pdfFile);
             logger.info("Pdf file is created ");
         } catch (FileNotFoundException e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
