@@ -29,6 +29,7 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.CertificateResponse;
+import org.sunbird.response.CertificateResponseV1;
 import org.sunbird.response.CertificateResponseV2;
 import org.sunbird.response.Response;
 import scala.Some;
@@ -138,19 +139,16 @@ public class CertificateGeneratorActor extends BaseActor {
                 String jsonData = certificateGenerator.generateCertificateJson();
                 Map<String, Object> uploadRes = uploadJson(directory + uuid, certStore, certStoreFactory.setCloudPath(storeParams));
                 String version = (String) request.getContext().get(JsonKey.VERSION);
+                CertificateResponse certificateResponse;
                 if (version.equalsIgnoreCase(JsonKey.VERSION_2)) {
-                    CertificateResponseV2 certificateResponseV2 = new CertificateResponseV2(uuid, accessCode,
-                            certModel.getIdentifier(), qrImageUrl, mapper.readValue(jsonData, Map.class));
-                    certificateResponseV2.setJsonUrl(properties.get(JsonKey.BASE_PATH).concat((String) uploadRes.get(JsonKey.JSON_URL)));
-                    certUrlList.add(mapper.convertValue(certificateResponseV2, new TypeReference<Map<String, Object>>(){}));
+                    certificateResponse = new CertificateResponseV2(uuid, accessCode, certModel.getIdentifier(), mapper.readValue(jsonData, Map.class), qrImageUrl);
                 } else {
                     String htmlTemplateUrl =  (String)((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
                     String pdfLink = PdfGenerator.generate(htmlTemplateUrl, certificateExtension, qrImageUrl, getContainerName(storeParams), certStoreFactory.setCloudPath(storeParams));
-                    CertificateResponse certificateResponse = new CertificateResponse(uuid, accessCode, jsonData, certModel.getIdentifier(), pdfLink);
-                    certificateResponse.setJsonLink(properties.get(JsonKey.BASE_PATH).concat((String) uploadRes.get(JsonKey.JSON_URL)));
-                    certificateResponse.setPdfLink(properties.get(JsonKey.BASE_PATH).concat(certificateResponse.getPdfLink()));
-                    certUrlList.add(getResponse(certificateResponse));
+                    certificateResponse = new CertificateResponseV1(uuid, accessCode,certModel.getIdentifier(), mapper.readValue(jsonData, Map.class), properties.get(JsonKey.BASE_PATH).concat(pdfLink));
                 }
+                certificateResponse.setJsonUrl(properties.get(JsonKey.BASE_PATH).concat((String) uploadRes.get(JsonKey.JSON_URL)));
+                certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>(){}));
             } catch (Exception ex) {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
@@ -200,22 +198,6 @@ public class CertificateGeneratorActor extends BaseActor {
         Map<String, Object> resMap = new HashMap<>();
         File file = FileUtils.getFile(fileName.concat(".json"));
         resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
-        return resMap;
-    }
-
-
-    private Map<String, Object> getResponse(CertificateResponse certificateResponse) {
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
-        resMap.put(JsonKey.RECIPIENT_ID, certificateResponse.getRecipientId());
-        resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
-        resMap.put(JsonKey.PDF_URL, certificateResponse.getPdfLink());
-        resMap.put(JsonKey.JSON_URL, certificateResponse.getJsonLink());
-        try {
-            resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(), Map.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return resMap;
     }
 
