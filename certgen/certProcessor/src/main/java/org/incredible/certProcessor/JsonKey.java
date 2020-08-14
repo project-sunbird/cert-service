@@ -12,6 +12,7 @@ public interface JsonKey {
     String DOMAIN_URL = "sunbird_cert_domain_url";
     String BADGE_URL = "BADGE_URL";
     String ISSUER_URL = "ISSUER_URL";
+    String EVIDENCE_URL = "EVIDENCE_URL";
     String CONTEXT = "CONTEXT";
     String VERIFICATION_TYPE = "VERIFICATION_TYPE";
     String PUBLIC_KEY_URL = "PUBLIC_KEY_URL";

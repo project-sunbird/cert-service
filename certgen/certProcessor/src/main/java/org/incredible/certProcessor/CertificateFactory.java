@@ -70,7 +70,7 @@ public class CertificateFactory {
          * Training evidence
          */
         if (StringUtils.isNotBlank(certModel.getCourseName())) {
-            trainingEvidenceBuilder.setId(uuid).setName(certModel.getCourseName());
+            trainingEvidenceBuilder.setId(properties.get(JsonKey.EVIDENCE_URL)).setName(certModel.getCourseName());
             certificateExtensionBuilder.setEvidence(trainingEvidenceBuilder.build());
         }
 

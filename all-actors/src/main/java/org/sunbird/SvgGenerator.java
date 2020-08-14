@@ -83,6 +83,7 @@ public class SvgGenerator {
                 Method method = htmlVarResolver.getClass().getMethod("get" + StringUtils.capitalize(macro));
                 method.setAccessible(true);
                 String data = URLEncoder.encode((String) method.invoke(htmlVarResolver), "UTF-8");
+                // URLEncoder.encode replace space with "+", but it should %20
                 context.put(macro, data.replace("+", "%20"));
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | UnsupportedEncodingException e) {
                 logger.info("exception while replacing TemplateVars of svg {}", e.getMessage());
