@@ -67,7 +67,7 @@ public class SvgGenerator {
             encodedSvg = "data:image/svg+xml," + replaceTemplateVars(encodeData(svgContent), certificateExtension, encodedQrCode);
             encodedSvg = encodedSvg.replaceAll("\n", "").replaceAll("\t", "");
         } catch (IOException e) {
-            logger.info("");
+            logger.info("SvgGenerator:generate exception while encoding svgContent {}", e.getMessage());
         }
         return encodedSvg;
     }
@@ -85,7 +85,7 @@ public class SvgGenerator {
                 String data = URLEncoder.encode((String) method.invoke(htmlVarResolver), "UTF-8");
                 context.put(macro, data.replace("+", "%20"));
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | UnsupportedEncodingException e) {
-                logger.info("exception while generating svg for certificate {}", e.getMessage());
+                logger.info("exception while replacing TemplateVars of svg {}", e.getMessage());
             }
         }
         context.put("qrCodeImage", "data:image/png;base64," + encodeQrCode);
