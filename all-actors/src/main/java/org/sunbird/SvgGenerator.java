@@ -56,7 +56,7 @@ public class SvgGenerator {
         this.directory = directory;
     }
 
-    public String generate(CertificateExtension certificateExtension, String encodedQrCode) {
+    public String generate(CertificateExtension certificateExtension, String encodedQrCode) throws BaseException {
         String svgFileName = getSvgFileName();
         String svgContent;
         File file = new File(directory + svgFileName);
@@ -71,6 +71,7 @@ public class SvgGenerator {
         } catch (IOException e) {
             logger.info("SvgGenerator:generate exception while encoding svgContent {}", e.getMessage());
         }
+        logger.info("svg template string creation completed");
         return encodedSvg;
     }
 
@@ -112,7 +113,7 @@ public class SvgGenerator {
         return stringBuffer.toString();
     }
 
-    private String readSvgContent(String path) {
+    private String readSvgContent(String path)  throws BaseException {
         FileInputStream fis;
         String svgContent = null;
         try {
@@ -121,6 +122,7 @@ public class SvgGenerator {
             fis.close();
         } catch (IOException e) {
             logger.info("Exception occurred while reading svg content {}", path);
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
         return svgContent;
     }
