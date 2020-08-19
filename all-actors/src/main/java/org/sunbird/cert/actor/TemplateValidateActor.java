@@ -24,8 +24,9 @@ import java.util.Set;
  * This actor is responsible for Template validation
  */
 @ActorConfig(
-        tasks = {JsonKey.VALIDATE_TEMPLATE},
-        asyncTasks = {}
+  dispatcher = "cert-dispatcher",
+  tasks = {JsonKey.VALIDATE_TEMPLATE},
+  asyncTasks = {}
 )
 public class TemplateValidateActor extends BaseActor {
 
@@ -34,7 +35,7 @@ public class TemplateValidateActor extends BaseActor {
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info("onReceive method call start for operation " + operation);
+        logger.info("onReceive method call start for operation {}", operation);
         if (JsonKey.VALIDATE_TEMPLATE.equalsIgnoreCase(operation)) {
             validateTemplate(request);
         }
@@ -60,10 +61,10 @@ public class TemplateValidateActor extends BaseActor {
                 throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
             }
         } catch (StorageServiceException e) {
-            logger.info("exception while downloading " + e.getMessage());
+            logger.info("exception while downloading {}", e.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         } catch (IOException e) {
-            logger.info("exception while unzipping " + e.getMessage());
+            logger.info("exception while unzipping {}", e.getMessage());
             throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
         } finally {
             htmlTemplateZip.cleanUp();

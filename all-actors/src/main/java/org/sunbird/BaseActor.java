@@ -10,10 +10,7 @@ import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Amit Kumar
@@ -25,15 +22,19 @@ public abstract class BaseActor extends UntypedAbstractActor {
    
     @Override
     public void onReceive(Object message) throws Throwable {
-        Map<String, Object> mdc = new HashMap<>();
-        mdc.put(JsonKey.REQ_ID, UUID.randomUUID().toString());
-        logger.setMDC(mdc);
-        //set mdc for non Actor
-        new BaseLogger().setReqId(logger.getMDC());
         if (message instanceof Request) {
             Request request = (Request) message;
+            Map<String, Object> trace = new HashMap<>();
+            if (request.getHeaders().containsKey(JsonKey.REQUEST_MESSAGE_ID)) {
+                ArrayList<String> requestIds =
+                        (ArrayList<String>) request.getHeaders().get(JsonKey.REQUEST_MESSAGE_ID);
+                trace.put(JsonKey.REQUEST_MESSAGE_ID, requestIds.get(0));
+                logger.setMDC(trace);
+                // set mdc for non actors
+                new BaseLogger().setReqId(logger.getMDC());
+            }
             String operation = request.getOperation();
-            logger.info("BaseActor:onReceive called for operation:" + operation);
+            logger.info("BaseActor:onReceive called for operation: {}", operation);
             try {
                 logger.info("method started : operation {}", operation);
                 onReceive(request);

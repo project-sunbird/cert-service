@@ -71,5 +71,10 @@ public class AzureStore extends CloudStore {
         }
 
     }
+
+    @Override
+    public void close(){
+        cloudStorage.closeConnection();
+    }
 }
 

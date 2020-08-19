@@ -66,4 +66,9 @@ public class LocalStore implements ICertStore {
         output.flush();
     }
 
+    @Override
+    public void close(){
+        
+    }
+
 }
