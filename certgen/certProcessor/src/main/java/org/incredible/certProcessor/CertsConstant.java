@@ -1,7 +1,6 @@
-package org.sunbird;
+package org.incredible.certProcessor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.incredible.certProcessor.JsonKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +136,7 @@ public class CertsConstant {
         return BASE_PATH + "/" + keyId + PUBLIC_KEY_URL;
     }
 
-    public String getEncryptionServiceUrl() {
+    public static String getEncryptionServiceUrl() {
         return getEncServiceUrl();
     }
 

@@ -1,6 +1,6 @@
 package org.sunbird.response;
 
-import org.sunbird.message.ResponseCode;
+import org.incredible.message.ResponseCode;
 
 import java.io.Serializable;
 import java.util.HashMap;

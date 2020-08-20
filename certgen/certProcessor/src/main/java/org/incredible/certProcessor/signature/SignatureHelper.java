@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.incredible.certProcessor.CertsConstant;
 import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.slf4j.Logger;
@@ -30,7 +31,13 @@ public class SignatureHelper {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public SignatureHelper(String encServiceUrl) {
+    private  static String encServiceUrl;
+
+    static {
+        encServiceUrl = CertsConstant.getEncryptionServiceUrl();
+    }
+
+    public SignatureHelper() {
         SIGN_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.SIGN + "/");
         VERIFY_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.VERIFY);
     }

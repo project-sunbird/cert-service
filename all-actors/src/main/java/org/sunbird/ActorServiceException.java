@@ -1,5 +1,7 @@
 package org.sunbird;
 
+import org.incredible.exeptions.BaseException;
+
 public class ActorServiceException extends Exception{
 
     public static class InvalidOperationName extends BaseException

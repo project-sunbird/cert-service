@@ -1,4 +1,4 @@
-package org.sunbird.message;
+package org.incredible.message;
 
 /**
  * This interface will hold all the response key and message

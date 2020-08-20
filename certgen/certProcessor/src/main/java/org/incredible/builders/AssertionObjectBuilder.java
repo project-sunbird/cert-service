@@ -3,7 +3,7 @@ package org.incredible.builders;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.pojos.ob.Assertion;
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
+import org.incredible.exeptions.InvalidDateFormatException;
 
 
 public class AssertionObjectBuilder implements IBuilder<Assertion> {

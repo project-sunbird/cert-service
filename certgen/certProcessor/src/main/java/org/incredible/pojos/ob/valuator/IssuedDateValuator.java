@@ -1,15 +1,18 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
+import org.incredible.exeptions.InvalidDateFormatException;
 
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class IssuedDateValuator implements IEvaluator {
 
-    private static List<SimpleDateFormat> dateFormats = Arrays.asList(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private List<SimpleDateFormat> dateFormats = Arrays.asList(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
             , new SimpleDateFormat("yyyy-MM-dd"));
 
     @Override
@@ -25,9 +28,6 @@ public class IssuedDateValuator implements IEvaluator {
 
     public Date convertToDate(String input) throws InvalidDateFormatException {
         Date date = null;
-        if (null == input) {
-            throw new InvalidDateFormatException("issued date cannot be null");
-        }
         for (SimpleDateFormat format : dateFormats) {
             try {
                 format.setLenient(false);
@@ -39,11 +39,9 @@ public class IssuedDateValuator implements IEvaluator {
             }
         }
         if (date == null) {
-            throw new InvalidDateFormatException("issued date is not in valid format");
-
-        } else {
-            return date;
+            throw new InvalidDateFormatException("issued date " + input + " is not in valid format");
         }
+        return date;
     }
 
 }

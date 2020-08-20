@@ -1,6 +1,6 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
+import org.incredible.exeptions.InvalidDateFormatException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

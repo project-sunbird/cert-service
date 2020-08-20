@@ -13,12 +13,12 @@ import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
 import org.sunbird.BaseActor;
-import org.sunbird.BaseException;
-import org.sunbird.CertsConstant;
+import org.incredible.exeptions.BaseException;
+import org.incredible.certProcessor.CertsConstant;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
-import org.sunbird.message.IResponseMessage;
-import org.sunbird.message.ResponseCode;
+import org.incredible.message.IResponseMessage;
+import org.incredible.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 
@@ -185,7 +185,7 @@ public class CertificateVerifierActor extends BaseActor {
         certificateExtension.remove(JsonKey.SIGNATURE);
         JsonNode jsonNode = mapper.valueToTree(certificateExtension);
         CertificateFactory certificateFactory = new CertificateFactory();
-        Boolean isValid = certificateFactory.verifySignature(jsonNode, signatureValue, certsConstant.getEncryptionServiceUrl(),
+        Boolean isValid = certificateFactory.verifySignature(jsonNode, signatureValue,
                 ((Map<String, String>) certificateExtension.get(JsonKey.VERIFICATION)).get(JsonKey.CREATOR));
         if (!isValid) {
             message = "ERROR: Assertion.signature - certificate is not valid , signature verification failed";

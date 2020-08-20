@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
+import org.incredible.exeptions.BaseException;
+import org.incredible.message.IResponseMessage;
+import org.incredible.message.ResponseCode;
 import org.incredible.pojos.CertificateExtension;
 
 import java.io.IOException;
@@ -18,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +34,7 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
-            throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws BaseException {
 
         String basePath = getDomainUrl(properties);
         uuid = basePath + "/" + UUID.randomUUID().toString();
@@ -91,7 +92,7 @@ public class CertificateFactory {
             logger.info("CertificateExtension:createCertificate: if keyID is not empty then verification type is SignedBadge");
 
             /** certificate  signature value **/
-            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties.get(JsonKey.ENC_SERVICE_URL), properties.get(JsonKey.KEY_ID));
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties.get(JsonKey.KEY_ID));
 
             /**
              * to assign signature value
@@ -112,12 +113,11 @@ public class CertificateFactory {
      *
      * @param certificate
      * @param signatureValue
-     * @param encServiceUrl
      * @return
      */
-    public boolean verifySignature(JsonNode certificate, String signatureValue, String encServiceUrl, String creator) throws SignatureException.UnreachableException, SignatureException.VerificationException {
+    public boolean verifySignature(JsonNode certificate, String signatureValue, String creator) throws SignatureException.UnreachableException, SignatureException.VerificationException {
         boolean isValid = false;
-        SignatureHelper signatureHelper = new SignatureHelper(encServiceUrl);
+        SignatureHelper signatureHelper = new SignatureHelper();
             Map<String, Object> signReq = new HashMap<>();
             signReq.put(JsonKey.CLAIM, certificate);
             signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
@@ -131,19 +131,21 @@ public class CertificateFactory {
      * to get signature value of certificate
      *
      * @param certificateExtension
-     * @param encServiceUrl
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, String encServiceUrl, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
-        SignatureHelper signatureHelper = new SignatureHelper(encServiceUrl);
+    private String getSignatureValue(CertificateExtension certificateExtension, String keyID)  throws BaseException {
+        SignatureHelper signatureHelper = new SignatureHelper();
         Map<String, Object> signMap;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        String request = mapper.writeValueAsString(certificateExtension);
-        JsonNode jsonNode = mapper.readTree(request);
-        logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
-        signMap = signatureHelper.generateSignature(jsonNode, keyID);
-        return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
-
+        try {
+            String request = mapper.writeValueAsString(certificateExtension);
+            JsonNode jsonNode = mapper.readTree(request);
+            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
+            signMap = signatureHelper.generateSignature(jsonNode, keyID);
+            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
+        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
+            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+        }
     }
 
     /**
@@ -170,7 +172,6 @@ public class CertificateFactory {
     /**
      * appends slug , org id, batch id to the domain url
      *
-     * @param properties
      * @return
      */
     private String getDomainUrl(Map<String, String> properties) {
