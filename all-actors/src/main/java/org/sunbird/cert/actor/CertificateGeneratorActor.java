@@ -151,11 +151,11 @@ public class CertificateGeneratorActor extends BaseActor {
             } catch (Exception ex) {
                 logger.error("generateCertificate:Exception Occurred while generating certificate. : {}", ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
-            }  finally {
-                try {
-                    certStoreFactory.cleanUp(uuid, directory);
+            } finally {
+              try{
+                certStoreFactory.cleanUp(uuid, directory);
                 } catch (Exception ex) {
-                    logger.error("Exception occurred during resource clean");
+                  logger.error("Exception occurred during resource clean");
                 }
             }
         }
