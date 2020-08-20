@@ -122,16 +122,6 @@ public class CertsConstant {
 
     }
 
-    public String getEncSignUrl() {
-        return String.format("%s/%s", ENC_SERVICE_URL, JsonKey.SIGN);
-    }
-
-    public String getEncSignVerifyUrl() {
-        return String.format("%s/%s", ENC_SERVICE_URL, JsonKey.VERIFY);
-
-    }
-
-
     public String getSignCreator(String keyId) {
         return BASE_PATH + "/" + keyId + PUBLIC_KEY_URL;
     }

@@ -25,9 +25,9 @@ import javax.ws.rs.core.MediaType;
 
 public class SignatureHelper {
 
-    private final String SIGN_API_ENDPOINT;
+    private static final String SIGN_API_ENDPOINT;
 
-    private final String VERIFY_API_ENDPOINT;
+    private static final String VERIFY_API_ENDPOINT;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -35,11 +35,11 @@ public class SignatureHelper {
 
     static {
         encServiceUrl = CertsConstant.getEncryptionServiceUrl();
+        SIGN_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.SIGN + "/");
+        VERIFY_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.VERIFY);
     }
 
     public SignatureHelper() {
-        SIGN_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.SIGN + "/");
-        VERIFY_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.VERIFY);
     }
 
     private static Logger logger = LoggerFactory.getLogger(SignatureHelper.class);

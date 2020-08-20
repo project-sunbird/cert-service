@@ -263,9 +263,6 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
         properties.put(JsonKey.VERIFICATION_TYPE, certVar.getVERIFICATION_TYPE());
         properties.put(JsonKey.ACCESS_CODE_LENGTH, certVar.getACCESS_CODE_LENGTH());
-        properties.put(JsonKey.SIGN_URL, certVar.getEncSignUrl());
-        properties.put(JsonKey.SIGN_VERIFY_URL, certVar.getEncSignVerifyUrl());
-        properties.put(JsonKey.ENC_SERVICE_URL, certVar.getEncryptionServiceUrl());
         properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
         properties.put(JsonKey.BASE_PATH, certVar.getBasePath());
