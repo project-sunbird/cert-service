@@ -1,6 +1,6 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.exeptions.InvalidDateFormatException;
+import org.incredible.exceptions.InvalidDateFormatException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

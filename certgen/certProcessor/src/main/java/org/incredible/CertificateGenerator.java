@@ -11,7 +11,7 @@ import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.incredible.message.IResponseMessage;
 import org.incredible.message.ResponseCode;
 import org.incredible.pojos.CertificateExtension;

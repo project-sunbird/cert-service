@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.Application;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.sunbird.RequestValidatorFunction;
 import org.incredible.message.Localizer;
 import org.sunbird.request.Request;

@@ -1,6 +1,6 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.exeptions.InvalidDateFormatException;
+import org.incredible.exceptions.InvalidDateFormatException;
 
 public interface IEvaluator {
 

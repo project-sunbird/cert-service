@@ -15,7 +15,7 @@ import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
 import org.incredible.pojos.CertificateExtension;
 import org.sunbird.BaseActor;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.sunbird.CertMapper;
 import org.incredible.certProcessor.CertsConstant;
 import org.sunbird.PdfGenerator;

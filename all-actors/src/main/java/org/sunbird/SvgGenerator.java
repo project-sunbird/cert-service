@@ -9,7 +9,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.incredible.certProcessor.store.LocalStore;
 import org.incredible.certProcessor.views.HTMLTemplateValidator;
 import org.incredible.certProcessor.views.HTMLVarResolver;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.incredible.pojos.CertificateExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

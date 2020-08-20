@@ -151,7 +151,7 @@ public class CertificateGeneratorActorTest {
 
     private Request createCertRequest() {
         Request reqObj = new Request();
-        reqObj.setOperation(JsonKey.GENERATE_CERT);
+        reqObj.setOperation(JsonKey.GENERATE_CERT_V2);
         Map<String, Object> innerMap = new HashMap<>();
         List<Map<String, Object>> listOfData = new ArrayList<>();
         Map<String, Object> data = new HashMap<>();

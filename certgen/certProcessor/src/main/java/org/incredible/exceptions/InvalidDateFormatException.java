@@ -1,12 +1,9 @@
-package org.incredible.exeptions;
+package org.incredible.exceptions;
 
 import org.incredible.message.IResponseMessage;
-import org.incredible.message.Localizer;
 
 
 public class InvalidDateFormatException extends BaseException {
-
-    private static Localizer localizer = Localizer.getInstance();
 
     public InvalidDateFormatException(String msg) {
         super(

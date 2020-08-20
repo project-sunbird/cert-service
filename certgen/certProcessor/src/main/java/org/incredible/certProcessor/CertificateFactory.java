@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.incredible.message.IResponseMessage;
 import org.incredible.message.ResponseCode;
 import org.incredible.pojos.CertificateExtension;

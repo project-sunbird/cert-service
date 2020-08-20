@@ -1,4 +1,4 @@
-package org.incredible.exeptions;
+package org.incredible.exceptions;
 
 
 /**

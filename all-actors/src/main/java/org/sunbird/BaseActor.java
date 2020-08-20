@@ -5,7 +5,7 @@ import akka.event.DiagnosticLoggingAdapter;
 import akka.event.Logging;
 import org.incredible.certProcessor.BaseLogger;
 import org.incredible.certProcessor.JsonKey;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.incredible.message.IResponseMessage;
 import org.incredible.message.Localizer;
 import org.incredible.message.ResponseCode;

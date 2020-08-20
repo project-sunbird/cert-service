@@ -6,7 +6,7 @@ package utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.sunbird.ActorServiceException;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.incredible.message.IResponseMessage;
 import org.incredible.message.Localizer;
 import org.incredible.message.ResponseCode;

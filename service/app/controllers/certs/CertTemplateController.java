@@ -6,7 +6,7 @@ import controllers.RequestHandler;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.JsonKey;
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 import org.sunbird.es.ElasticSearchUtil;
 import org.incredible.message.IResponseMessage;
 import org.incredible.message.ResponseCode;

@@ -1,6 +1,6 @@
 package org.sunbird;
 
-import org.incredible.exeptions.BaseException;
+import org.incredible.exceptions.BaseException;
 
 public class ActorServiceException extends Exception{
 
