@@ -185,7 +185,7 @@ public class CertificateVerifierActor extends BaseActor {
         certificateExtension.remove(JsonKey.SIGNATURE);
         JsonNode jsonNode = mapper.valueToTree(certificateExtension);
         CertificateFactory certificateFactory = new CertificateFactory();
-        Boolean isValid = certificateFactory.verifySignature(jsonNode, signatureValue,
+        Boolean isValid = certificateFactory.verifySignature(jsonNode, signatureValue, certsConstant.getEncryptionServiceUrl(),
                 ((Map<String, String>) certificateExtension.get(JsonKey.VERIFICATION)).get(JsonKey.CREATOR));
         if (!isValid) {
             message = "ERROR: Assertion.signature - certificate is not valid , signature verification failed";

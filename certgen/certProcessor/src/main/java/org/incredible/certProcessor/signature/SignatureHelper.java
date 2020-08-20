@@ -4,7 +4,6 @@ package org.incredible.certProcessor.signature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,21 +24,15 @@ import javax.ws.rs.core.MediaType;
 
 public class SignatureHelper {
 
-    private static final String SIGN_API_ENDPOINT;
+    private final String SIGN_API_ENDPOINT;
 
-    private static final String VERIFY_API_ENDPOINT;
+    private final String VERIFY_API_ENDPOINT;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private  static String encServiceUrl;
-
-    static {
-        encServiceUrl = getEncryptionServiceUrl();
+    public SignatureHelper(String encServiceUrl) {
         SIGN_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.SIGN + "/");
         VERIFY_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.VERIFY);
-    }
-
-    public SignatureHelper() {
     }
 
     private static Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
@@ -109,12 +102,6 @@ public class SignatureHelper {
         }
         logger.debug("verify method ends with value {}", result);
         return result;
-    }
-
-    private static String getEncryptionServiceUrl() {
-        String encServiceUrl = System.getenv(JsonKey.ENC_SERVICE_URL);
-        return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "http://enc-service:8013";
-
     }
 
 }

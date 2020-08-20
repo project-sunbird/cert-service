@@ -42,9 +42,11 @@ public class IssuedDateValuator implements IEvaluator {
             }
         }
         if (date == null) {
-            throw new InvalidDateFormatException("issued date " + input + " is not in valid format");
+            throw new InvalidDateFormatException("issued date is not in valid format");
+
+        } else {
+            return date;
         }
-        return date;
     }
 
 }

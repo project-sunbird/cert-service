@@ -28,6 +28,7 @@ public class CertsConstant {
     private static final String SIGNATORY_EXTENSION = "v1/extensions/SignatoryExtension";
     private static String DOMAIN_URL = getDomainUrlFromEnv();
     private String CONTAINER_NAME;
+    private static final String ENC_SERVICE_URL = getEncServiceUrl();
     private String CLOUD_STORAGE_TYPE;
     private static String BASE_PATH;
     private static final String SLUG = getSlugFormEnv();
@@ -116,9 +117,28 @@ public class CertsConstant {
         logger.error("Constant:printErrorForMissingEnv:No env variable found ".concat(env));
     }
 
+    private static String getEncServiceUrl() {
+        String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
+        return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "http://enc-service:8013";
+
+    }
+
+    public String getEncSignUrl() {
+        return String.format("%s/%s", ENC_SERVICE_URL, JsonKey.SIGN);
+    }
+
+    public String getEncSignVerifyUrl() {
+        return String.format("%s/%s", ENC_SERVICE_URL, JsonKey.VERIFY);
+
+    }
+
 
     public String getSignCreator(String keyId) {
         return BASE_PATH + "/" + keyId + PUBLIC_KEY_URL;
+    }
+
+    public String getEncryptionServiceUrl() {
+        return getEncServiceUrl();
     }
 
     public static String getExpiryLink(String key) {
