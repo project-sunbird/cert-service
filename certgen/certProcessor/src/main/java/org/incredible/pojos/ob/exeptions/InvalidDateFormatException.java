@@ -1,4 +1,4 @@
-package org.incredible.pojos.ob.exceptions;
+package org.incredible.pojos.ob.exeptions;
 
 
 public class InvalidDateFormatException extends Exception {

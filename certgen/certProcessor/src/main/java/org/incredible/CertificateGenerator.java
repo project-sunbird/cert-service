@@ -13,7 +13,7 @@ import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
+import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,8 @@ public class CertificateGenerator {
         this.properties = properties;
     }
 
-    public CertificateExtension getCertificateExtension (CertModel certModel) throws SignatureException.UnreachableException, InvalidDateFormatException, SignatureException.CreationException, IOException {
+    public CertificateExtension getCertificateExtension (CertModel certModel) throws SignatureException.UnreachableException,
+            InvalidDateFormatException, SignatureException.CreationException, IOException {
         this.certificateExtension = certificateFactory.createCertificate(certModel, properties);
         return certificateExtension;
     }
@@ -87,7 +88,8 @@ public class CertificateGenerator {
         }
     }
 
-    public Map<String,Object> generateQrCode() throws WriterException, FontFormatException, NotFoundException, IOException {
+    public Map<String,Object> generateQrCode() throws WriterException,
+            FontFormatException, NotFoundException, IOException {
         checkDirectoryExists();
         Map<String,Object> qrMap = new HashMap<>();
         AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get(JsonKey.ACCESS_CODE_LENGTH)));
@@ -98,6 +100,7 @@ public class CertificateGenerator {
         qrCodeGenerationModel.setData(properties.get(JsonKey.BASE_PATH).concat("/") + getUUID(certificateExtension));
         QRCodeImageGenerator qrCodeImageGenerator = new QRCodeImageGenerator();
         File qrCodeFile = qrCodeImageGenerator.createQRImages(qrCodeGenerationModel);
+
         qrMap.put(JsonKey.QR_CODE_FILE,qrCodeFile);
         qrMap.put(JsonKey.ACCESS_CODE,accessCode);
         logger.info("Qrcode {} is created for the certificate", qrCodeFile.getName());

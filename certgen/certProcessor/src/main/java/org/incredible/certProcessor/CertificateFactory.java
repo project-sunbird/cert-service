@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
-import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
+import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

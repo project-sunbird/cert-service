@@ -3,8 +3,6 @@ package org.sunbird.cert.actor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.WriterException;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -12,16 +10,14 @@ import org.incredible.CertificateGenerator;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
 import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
-import org.incredible.certProcessor.CertsConstant;
+import org.sunbird.CertsConstant;
 import org.sunbird.PdfGenerator;
 import org.sunbird.QRStorageParams;
 import org.sunbird.SvgGenerator;
@@ -38,7 +34,6 @@ import org.sunbird.response.CertificateResponseV1;
 import org.sunbird.response.Response;
 import scala.Some;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -210,29 +205,19 @@ public class CertificateGeneratorActor extends BaseActor {
         return data;
     }
 
-    private String uploadQrCode(File qrCodeFile,Map<String, String> properties) {
+    private String uploadQrCode(File qrCodeFile,Map<String, String> properties) throws IOException {
         CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
         QRStorageParams qrStorageParams = new QRStorageParams(certVar.getCloudStorageType());
         StoreConfig storeConfig = new StoreConfig(qrStorageParams.storeParams);
         ICertStore certStore = certStoreFactory.getCertStore(storeConfig, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
-        String qrImageUrl = null;
-        try {
-            qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
-        } catch (IOException e) {
-            logger.error("Exception occurred while uploading qrcode {}", e.getMessage());
-        }
+        String qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
         certStore.close();
         logger.info("QR code is created for the certificate : {} URL : {}", qrCodeFile.getName(), qrImageUrl);
         return qrImageUrl;
     }
 
-    private String encodeQrCode(File file) {
-        byte[] fileContent = new byte[0];
-        try {
-            fileContent = FileUtils.readFileToByteArray(file);
-        } catch (IOException e) {
-            logger.error("Exception occurred while encoding qrcode {}", e.getMessage());
-        }
+    private String encodeQrCode(File file) throws IOException {
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
         file.delete();
         return Base64.getEncoder().encodeToString(fileContent);
     }
@@ -246,14 +231,10 @@ public class CertificateGeneratorActor extends BaseActor {
         }
     }
 
-    private Map<String, Object> uploadJson(String fileName, ICertStore certStore, String cloudPath) {
+    private Map<String, Object> uploadJson(String fileName, ICertStore certStore, String cloudPath) throws IOException {
         Map<String, Object> resMap = new HashMap<>();
         File file = FileUtils.getFile(fileName.concat(".json"));
-        try {
-            resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
-        } catch (IOException e) {
-            logger.error("Exception occurred while uploading json {}", e.getMessage());
-        }
+        resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
         return resMap;
     }
 
