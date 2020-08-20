@@ -4,6 +4,7 @@ package org.incredible.certProcessor.signature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +12,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.incredible.certProcessor.CertsConstant;
 import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class SignatureHelper {
     private  static String encServiceUrl;
 
     static {
-        encServiceUrl = CertsConstant.getEncryptionServiceUrl();
+        encServiceUrl = getEncryptionServiceUrl();
         SIGN_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.SIGN + "/");
         VERIFY_API_ENDPOINT = encServiceUrl.concat("/" + JsonKey.VERIFY);
     }
@@ -109,6 +109,12 @@ public class SignatureHelper {
         }
         logger.debug("verify method ends with value {}", result);
         return result;
+    }
+
+    private static String getEncryptionServiceUrl() {
+        String encServiceUrl = System.getenv(JsonKey.ENC_SERVICE_URL);
+        return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "http://enc-service:8013";
+
     }
 
 }

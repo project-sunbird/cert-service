@@ -65,7 +65,7 @@ public class PdfGenerator {
     private static final String PRINT_SERVICE_URL = "http://print-service:5000/v1/print/pdf";
 
     public static String generate(String htmlTemplateUrl, CertificateExtension certificateExtension , String qrImageUrl,
-                                  String container, String path) {
+                                  String container, String path) throws IOException {
         long startTime = System.currentTimeMillis();
         Map<String, Object> printServiceReq = new HashMap<>();
         Map<String, Object> request = new HashMap<>();
@@ -76,14 +76,8 @@ public class PdfGenerator {
         storageParams.put(JsonKey.containerName,container);
         storageParams.put(JsonKey.PATH,path);
         request.put("storageParams",storageParams);
-        String pdfUrl;
-        String [] arr = new String[0];
-        try {
-            pdfUrl = callPrintService(printServiceReq);
-            arr = pdfUrl.split("/");
-        } catch (IOException e) {
-            logger.info("Exception while calling to print service {}", e.getMessage());
-        }
+        String pdfUrl = callPrintService(printServiceReq);
+        String [] arr = pdfUrl.split("/");
         long endTime = System.currentTimeMillis();
         logger.info("Total time taken by print service to generate PDF = "+(endTime-startTime));
         return "/"+path+arr[arr.length-1];
