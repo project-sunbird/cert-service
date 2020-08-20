@@ -8,7 +8,7 @@ import org.incredible.pojos.Signature;
 import org.incredible.pojos.ob.BadgeClass;
 import org.incredible.pojos.ob.Evidence;
 import org.incredible.pojos.ob.VerificationObject;
-import org.incredible.exceptions.InvalidDateFormatException;
+import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 
 
 public class CertificateExtensionBuilder implements IBuilder<CertificateExtension> {

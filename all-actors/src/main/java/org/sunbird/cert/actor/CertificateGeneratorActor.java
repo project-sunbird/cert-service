@@ -3,6 +3,8 @@ package org.sunbird.cert.actor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.WriterException;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -10,12 +12,14 @@ import org.incredible.CertificateGenerator;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
+import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
 import org.incredible.pojos.CertificateExtension;
+import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 import org.sunbird.BaseActor;
-import org.incredible.exceptions.BaseException;
+import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
 import org.incredible.certProcessor.CertsConstant;
 import org.sunbird.PdfGenerator;
@@ -26,12 +30,15 @@ import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.CertificateResponse;
 import org.sunbird.response.CertificateResponseV1;
 import org.sunbird.response.Response;
 import scala.Some;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -146,7 +153,10 @@ public class CertificateGeneratorActor extends BaseActor {
                 certificateResponse.setJsonUrl(properties.get(JsonKey.BASE_PATH).concat((String) uploadRes.get(JsonKey.JSON_URL)));
                 certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {
                 }));
-            } finally {
+            } catch (Exception ex) {
+                logger.error("generateCertificate:Exception Occurred while generating certificate. : {}", ex.getMessage());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+            }  finally {
                 try {
                     certStoreFactory.cleanUp(uuid, directory);
                 } catch (Exception ex) {
@@ -169,14 +179,20 @@ public class CertificateGeneratorActor extends BaseActor {
         CertificateGenerator certificateGenerator = new CertificateGenerator(properties, directory);
         List<Map<String, Object>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
-            CertificateExtension certificateExtension = certificateGenerator.getCertificateExtension(certModel);
-            Map<String, Object> qrMap = certificateGenerator.generateQrCode();
-            String encodedQrCode = encodeQrCode((File) qrMap.get(JsonKey.QR_CODE_FILE));
-            SvgGenerator svgGenerator = new SvgGenerator((String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.SVG_TEMPLATE), directory);
-            String encodedSvg = svgGenerator.generate(certificateExtension, encodedQrCode);
-            certificateExtension.setPrintUri(encodedSvg);
-            CertificateResponse certificateResponse = new CertificateResponse(certificateGenerator.getUUID(certificateExtension), (String) qrMap.get(JsonKey.ACCESS_CODE), certModel.getIdentifier(), mapper.convertValue(certificateExtension, Map.class));
-            certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {}));
+            try {
+                CertificateExtension certificateExtension = certificateGenerator.getCertificateExtension(certModel);
+                Map<String, Object> qrMap = certificateGenerator.generateQrCode();
+                String encodedQrCode = encodeQrCode((File) qrMap.get(JsonKey.QR_CODE_FILE));
+                SvgGenerator svgGenerator = new SvgGenerator((String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.SVG_TEMPLATE), directory);
+                String encodedSvg = svgGenerator.generate(certificateExtension, encodedQrCode);
+                certificateExtension.setPrintUri(encodedSvg);
+                CertificateResponse certificateResponse = new CertificateResponse(certificateGenerator.getUUID(certificateExtension), (String) qrMap.get(JsonKey.ACCESS_CODE), certModel.getIdentifier(), mapper.convertValue(certificateExtension, Map.class));
+                certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {
+                }));
+            } catch (Exception ex) {
+                logger.error("generateCertificateV2:Exception Occurred while generating certificate. : {}", ex.getMessage());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+            }
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);

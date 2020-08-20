@@ -1,6 +1,6 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.exceptions.InvalidDateFormatException;
+import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +38,12 @@ public class IssuedDateValuatorTest {
         Date date = issuedDateValuator.convertToDate("2019-02-12T10:11:11Z");
         cal.setTime(date);
         assertEquals("2019-02-12T10:11:11Z", simpleDateFormat.format(cal.getTime()));
+    }
+
+    @Test(expected = InvalidDateFormatException.class)
+    public void evaluatesDateInNullException() throws InvalidDateFormatException {
+        issuedDateValuator.convertToDate(null);
+        fail("issued date cannot be null");
     }
 
     @Test(expected = InvalidDateFormatException.class)

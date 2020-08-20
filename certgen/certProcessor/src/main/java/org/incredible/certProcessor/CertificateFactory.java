@@ -7,9 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
-import org.incredible.exceptions.BaseException;
-import org.incredible.message.IResponseMessage;
-import org.incredible.message.ResponseCode;
 import org.incredible.pojos.CertificateExtension;
 
 import java.io.IOException;
@@ -21,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
+import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +32,7 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws BaseException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
         String basePath = getDomainUrl(properties);
         uuid = basePath + "/" + UUID.randomUUID().toString();
@@ -133,19 +131,15 @@ public class CertificateFactory {
      * @param certificateExtension
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, String keyID)  throws BaseException {
+    private String getSignatureValue(CertificateExtension certificateExtension, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
         SignatureHelper signatureHelper = new SignatureHelper();
         Map<String, Object> signMap;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        try {
-            String request = mapper.writeValueAsString(certificateExtension);
-            JsonNode jsonNode = mapper.readTree(request);
-            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
-            signMap = signatureHelper.generateSignature(jsonNode, keyID);
-            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
-        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
-            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
-        }
+        String request = mapper.writeValueAsString(certificateExtension);
+        JsonNode jsonNode = mapper.readTree(request);
+        logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
+        signMap = signatureHelper.generateSignature(jsonNode, keyID);
+        return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
     }
 
     /**

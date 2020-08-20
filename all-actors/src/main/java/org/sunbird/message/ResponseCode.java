@@ -1,4 +1,4 @@
-package org.incredible.message;
+package org.sunbird.message;
 
 /** @author Manzarul */
 public enum ResponseCode {

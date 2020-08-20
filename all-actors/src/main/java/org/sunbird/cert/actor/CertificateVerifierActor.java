@@ -13,12 +13,12 @@ import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
 import org.sunbird.BaseActor;
-import org.incredible.exceptions.BaseException;
+import org.sunbird.BaseException;
 import org.incredible.certProcessor.CertsConstant;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
-import org.incredible.message.IResponseMessage;
-import org.incredible.message.ResponseCode;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 

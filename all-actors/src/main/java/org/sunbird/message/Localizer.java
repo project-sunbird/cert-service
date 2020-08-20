@@ -1,4 +1,4 @@
-package org.incredible.message;
+package org.sunbird.message;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

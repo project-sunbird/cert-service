@@ -1,6 +1,6 @@
 package org.incredible.pojos.ob.valuator;
 
-import org.incredible.exceptions.InvalidDateFormatException;
+import org.incredible.pojos.ob.exceptions.InvalidDateFormatException;
 
 
 import java.text.ParseException;
@@ -28,6 +28,9 @@ public class IssuedDateValuator implements IEvaluator {
 
     public Date convertToDate(String input) throws InvalidDateFormatException {
         Date date = null;
+        if (null == input) {
+            throw new InvalidDateFormatException("issued date cannot be null");
+        }
         for (SimpleDateFormat format : dateFormats) {
             try {
                 format.setLenient(false);

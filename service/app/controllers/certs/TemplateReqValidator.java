@@ -2,9 +2,9 @@ package controllers.certs;
 
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.JsonKey;
-import org.incredible.exceptions.BaseException;
-import org.incredible.message.IResponseMessage;
-import org.incredible.message.ResponseCode;
+import org.sunbird.BaseException;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 
 import java.text.MessageFormat;
