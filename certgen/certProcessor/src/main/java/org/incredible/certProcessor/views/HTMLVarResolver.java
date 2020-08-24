@@ -10,7 +10,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class HTMLVarResolver {
 
@@ -105,6 +107,23 @@ public class HTMLVarResolver {
 
     public String getExpiryDate() {
         return certificateExtension.getExpires();
+    }
+
+    public Map<String, String> getCertMetaData() {
+        Map<String, String> metaData = new HashMap<>();
+        metaData.put("certificateName", getCertificateName());
+        metaData.put("certificateDescription",getCertificateDescription());
+        metaData.put("courseName", getCourseName());
+        metaData.put("issuedDate", getIssuedDate());
+        metaData.put("recipientId", getRecipientId());
+        metaData.put("recipientName", getRecipientName());
+        metaData.put("signatory0Image", getSignatory0Image());
+        metaData.put("signatory0Designation", getSignatory0Designation());
+        metaData.put("signatory1Image", getSignatory1Image());
+        metaData.put("signatory1Designation", getSignatory1Designation());
+        metaData.put("qrCodeImage", getQrCodeImage());
+        metaData.put("expiryDate", getExpiryDate());
+        return metaData;
     }
 
 }
