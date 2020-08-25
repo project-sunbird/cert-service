@@ -2,9 +2,6 @@ package org.sunbird;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.incredible.certProcessor.store.LocalStore;
 import org.incredible.certProcessor.views.HTMLVarResolver;
 import org.incredible.pojos.CertificateExtension;
@@ -58,7 +55,7 @@ public class SvgGenerator {
             encodedSvg = encodedSvg.replaceAll("\n", "").replaceAll("\t", "");
             cachedSvgTemplates.put(this.svgTemplate, encodedSvg);
         }
-        logger.info("svg template is cache {}", cachedSvgTemplates.containsKey(this.svgTemplate));
+        logger.info("svg template is cached {}", cachedSvgTemplates.containsKey(this.svgTemplate));
         String svgData = replaceTemplateVars(cachedSvgTemplates.get(this.svgTemplate), certificateExtension, encodedQrCode);
         logger.info("svg template string creation completed");
         return svgData;
