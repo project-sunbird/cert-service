@@ -293,7 +293,7 @@ public class CertificateGeneratorActor extends BaseActor {
         return properties;
     }
 
-    private static Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
+    private Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
         if (MapUtils.isNotEmpty(storeParams)) {
             return storeParams;
         } else {
