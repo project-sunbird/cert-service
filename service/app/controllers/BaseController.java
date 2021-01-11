@@ -107,6 +107,7 @@ public class BaseController extends Controller {
 			if (req.body() != null && req.body().asJson() != null) {
 				request = (Request) RequestMapper.mapRequest(req, Request.class);
 				request.setRequestContext(getRequestContext(req, operation));
+				System.out.println("Request Context : " + request.getRequestContext().getContextMap());
 			}
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
