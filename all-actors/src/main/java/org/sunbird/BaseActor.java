@@ -30,7 +30,6 @@ public abstract class BaseActor extends UntypedAbstractActor {
                 trace.put(JsonKey.REQUEST_MESSAGE_ID, requestIds.get(0));
             }
             String operation = request.getOperation();
-            System.out.println("Base Request Context : " + request.getRequestContext().getContextMap());
             logger.info(request.getRequestContext(), "BaseActor:onReceive called for operation: {}", operation);
             try {
                 logger.info(request.getRequestContext(), "method started : operation {}", operation);
