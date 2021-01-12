@@ -14,18 +14,13 @@ public class LoggerUtil {
     }
 
     public void info(RequestContext requestContext, String message, Object data) {
-        if (null != requestContext){
+        if (null != requestContext)
             logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);
-            System.out.println("LoggerUtil Info If");
-        }
-        else{
+        else
             logger.info(message, data);
-            System.out.println("LoggerUtil Info else");
-        }
     }
 
     public void info(RequestContext requestContext, String message) {
-        System.out.println("LoggerUtil Info If 2");
         info(requestContext, message, null);
     }
 
