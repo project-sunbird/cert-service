@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
 import org.sunbird.RequestValidatorFunction;
+import org.sunbird.incredible.processor.JsonKey;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
 import org.sunbird.request.RequestContext;
@@ -122,12 +123,14 @@ public class BaseController extends Controller {
 	}
 
 	private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
-		RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create("user_id")).orElse(null),
-				httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
-				httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
-				httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
-				(httpRequest.header("x-trace-enabled").isPresent() ? httpRequest.header("x-trace-enabled").orElse(debugEnabled): debugEnabled),
-				actorOperation);
+		RequestContext requestContext = new RequestContext(
+				System.getenv(JsonKey.SERVICE_NAME),
+				httpRequest.header("env").orElse(null),
+				httpRequest.header("x-device-id").orElse(null),
+				httpRequest.header("x-session-id").orElse(null),
+				httpRequest.header("x-app-id").orElse(null),
+				actorOperation,
+				httpRequest.header("x-app-ver").orElse(null));
 		return requestContext;
 	}
 

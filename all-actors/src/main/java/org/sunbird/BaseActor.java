@@ -29,11 +29,11 @@ public abstract class BaseActor extends UntypedAbstractActor {
                 trace.put(JsonKey.REQUEST_MESSAGE_ID, requestIds.get(0));
             }
             String operation = request.getOperation();
-            logger.info(request.getRequestContext(), "BaseActor:onReceive called for operation: {}", operation);
+            logger.customLogFormat(request.getRequestContext(), ((Request) message).getId(), "BaseActor:onReceive called for operation: {}", null, null, null);
             try {
-                logger.info(request.getRequestContext(), "method started : operation {}", operation);
+                logger.customLogFormat(request.getRequestContext(), ((Request) message).getId(), "method started : operation {}", null, null, null);
                 onReceive(request);
-                logger.info(request.getRequestContext(), "method ended : operation {}", operation);
+                logger.customLogFormat(request.getRequestContext(), ((Request) message).getId(), "method ended : operation {}", null, null, null);
             } catch (Exception e) {
                 logger.error(request.getRequestContext(), "Exception : operation {} : message : {} {} " + operation + " " + e.getMessage(), e);
                 onReceiveException(request.getRequestContext(), operation, e);

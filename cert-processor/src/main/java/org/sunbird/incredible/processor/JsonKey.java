@@ -127,4 +127,5 @@ public interface JsonKey {
     String QRCODE_IMAGE = "qrCodeImage";
     String EXPIRY_DATE = "expiryDate";
     String ISSUER_NAME = "issuerName";
+    String SERVICE_NAME = "serviceName";
 }

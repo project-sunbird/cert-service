@@ -15,7 +15,9 @@ public class RequestContext {
     private String op;
     private final String pid = "lms-service"; 
     private Map<String, Object> contextMap = new HashMap<>();
-    
+    private String channel;
+    private String env;
+    private Map<String, Object> pdata = new HashMap<>();
     
     public RequestContext(String uid, String did, String sid, String appId, String appVer, String reqId, String debugEnabled, String op) {
         this.uid = uid;
@@ -38,8 +40,25 @@ public class RequestContext {
         }});
         
     }
-    
-    
+
+    public RequestContext(String channel, String env, String did, String sid, String appId, String pid, String appVer) {
+        this.did = did;
+        this.sid = sid;
+        this.channel = channel;
+        this.env = env;
+        this.pdata.put("id", appId);
+        this.pdata.put("pid", pid);
+        this.pdata.put("ver", appVer);
+
+        contextMap.putAll(new HashMap<String, Object>(){{
+            put("did", did);
+            put("sid", sid);
+            put("channel", channel);
+            put("env", env);
+            put("pdata", pdata);
+        }});
+
+    }
 
     public String getReqId() {
         return reqId;

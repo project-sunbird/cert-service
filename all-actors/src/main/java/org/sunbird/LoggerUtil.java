@@ -1,10 +1,16 @@
 package org.sunbird;
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+
 import net.logstash.logback.marker.Markers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.request.RequestContext;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class LoggerUtil {
 
@@ -24,6 +30,10 @@ public class LoggerUtil {
 
     public void info(RequestContext requestContext, String message) {
         info(requestContext, message, null);
+    }
+
+    public void info(Map<String, Object> eventMap) {
+        logger.info("", keyValue("CustomLog", eventMap));
     }
 
     public void error(RequestContext requestContext, String message, Throwable e) {
@@ -54,6 +64,32 @@ public class LoggerUtil {
 
     private static boolean isDebugEnabled(RequestContext requestContext) {
         return (null != requestContext && StringUtils.equalsIgnoreCase("true", requestContext.getDebugEnabled()));
+    }
+
+    public void customLogFormat(RequestContext requestContext, String requestId, String msg, Map<String, Object> actor, Map<String, Object> object, Map<String, Object> params) {
+        Map<String, Object> edata = new HashMap<>();
+        Map<String, Object> eventMap = new HashMap<>();
+        edata.put("type", "system");
+        edata.put("level", "INFO");
+        edata.put("requestid", requestId);
+        edata.put("message", msg);
+        if(params != null)
+            edata.put("params", params);
+
+
+        eventMap.putAll(new HashMap<String, Object>(){{
+            put("eid", "LOG");
+            put("ets", System.currentTimeMillis());
+            put("ver", "3.0");
+            put("mid", "LOG:" + UUID.randomUUID().toString());
+
+            put("context", requestContext);
+            put("actor", actor);
+            if(object != null)
+                put("object", object);
+            put("edata", edata);
+        }});
+        info(eventMap);
     }
 
 }
