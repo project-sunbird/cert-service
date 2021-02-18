@@ -108,7 +108,7 @@ public class BaseController extends Controller {
 			Request request = new Request();
 			if (req.body() != null && req.body().asJson() != null) {
 				request = (Request) RequestMapper.mapRequest(req, Request.class);
-				request.setRequestContext(getRequestContext(req, operation));
+				request.setRequestContext(getRequestContext(req, operation, "API"));
 			}
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
@@ -122,15 +122,17 @@ public class BaseController extends Controller {
 
 	}
 
-	private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
+	private RequestContext getRequestContext(Http.Request httpRequest, String actorId, String actorType) {
 		RequestContext requestContext = new RequestContext(
-				System.getenv(JsonKey.SERVICE_NAME),
-				httpRequest.header("env").orElse(null),
+				JsonKey.SERVICE_NAME,
+				JsonKey.PRODUCER_NAME,
+				JsonKey.ENV,
 				httpRequest.header("x-device-id").orElse(null),
 				httpRequest.header("x-session-id").orElse(null),
-				httpRequest.header("x-app-id").orElse(null),
-				actorOperation,
-				httpRequest.header("x-app-ver").orElse(null));
+				"cert-service","1.0", null);
+		requestContext.setActorId(actorId);
+		requestContext.setActorType(actorType);
+		requestContext.setRequestId(httpRequest.header("x-trace-id").orElse(null));
 		return requestContext;
 	}
 

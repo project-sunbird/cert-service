@@ -1,95 +1,114 @@
 package org.sunbird;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
-
-import net.logstash.logback.marker.Markers;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.request.RequestContext;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class LoggerUtil {
 
     private Logger logger;
+    private String infoLevel = "INFO";
+    private String debugLevel = "DEBUG";
+    private String errorLevel = "ERROR";
+    private String warnLevel = "WARN";
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public  LoggerUtil(Class c) {
+    public LoggerUtil(Class c) {
         logger = LoggerFactory.getLogger(c);
     }
 
-    public void info(RequestContext requestContext, String message, Object data) {
-        if(null != requestContext) {
-            logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);
-        } else {
-            logger.info(message, data);
-        }
+    public void info(RequestContext requestContext, String message, Map<String, Object> object, List<Map<String, Object>> param) {
+        if (requestContext != null) {
+            requestContext.setLoggerLevel(infoLevel);
+            logger.info(jsonMapper(requestContext, message, object, param));
+        } else logger.info(message);
     }
 
     public void info(RequestContext requestContext, String message) {
-        info(requestContext, message, null);
+        info(requestContext, message, null, null);
     }
 
-    public void info(Map<String, Object> eventMap) {
-        logger.info("", keyValue("CustomLog", eventMap));
+    public void info(RequestContext requestContext, String message, Map<String, Object> object) {
+        info(requestContext, message, object, null);
+    }
+
+    public void info(RequestContext requestContext, String message, List<Map<String, Object>> param) {
+        info(requestContext, message, null, param);
+    }
+
+    public void debug(RequestContext requestContext, String message, Map<String, Object> object, List<Map<String, Object>> param) {
+        if (isDebugEnabled(requestContext)) {
+            requestContext.setLoggerLevel(debugLevel);
+            logger.info(jsonMapper(requestContext, message, object, param));
+        } else logger.debug(message);
+    }
+
+    public void debug(RequestContext requestContext, String message) {
+        debug(requestContext, message, null, null);
+    }
+
+    public void debug(RequestContext requestContext, String message, Map<String, Object> object) {
+        debug(requestContext, message, object, null);
+    }
+
+    public void debug(RequestContext requestContext, String message, List<Map<String, Object>> param) {
+        debug(requestContext, message, null, param);
+    }
+
+    public void error(RequestContext requestContext, String message, Map<String, Object> object, List<Map<String, Object>> param, Throwable e) {
+        if (requestContext != null) {
+            requestContext.setLoggerLevel(errorLevel);
+            logger.error(jsonMapper(requestContext, message, object, param), e);
+        } else logger.error(message, e);
     }
 
     public void error(RequestContext requestContext, String message, Throwable e) {
-        if(null != requestContext) {
-            logger.error(Markers.appendEntries(requestContext.getContextMap()) ,message, e);
-        } else {
-            logger.error(message, e);
-        }
+        error(requestContext, message, null, null, e);
+    }
+
+    public void error(RequestContext requestContext, String message, Map<String, Object> object, Throwable e) {
+        error(requestContext, message, object, null, e);
+    }
+
+    public void error(RequestContext requestContext, String message, List<Map<String, Object>> param, Throwable e) {
+        error(requestContext, message, null, param, e);
+    }
+
+    public void warn(RequestContext requestContext, String message, Map<String, Object> object, List<Map<String, Object>> param, Throwable e) {
+        if (requestContext != null) {
+            requestContext.setLoggerLevel(warnLevel);
+            logger.warn((jsonMapper(requestContext, message, object, param)), e);
+        } else logger.warn(message, e);
     }
 
     public void warn(RequestContext requestContext, String message, Throwable e) {
-        if(null != requestContext) {
-            logger.warn(Markers.appendEntries(requestContext.getContextMap()), message, e);
-        } else {
-            logger.warn(message, e);
-        }
+        warn(requestContext, message, null, null, e);
     }
 
-    public void debug(RequestContext requestContext, String message, Object data) {
-        if(isDebugEnabled(requestContext)) {
-            logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);
-        } else {
-            logger.debug(message, data);
-        }
+    public void warn(RequestContext requestContext, String message, Map<String, Object> object, Throwable e) {
+        warn(requestContext, message, object, null, e);
     }
 
-    public void debug(RequestContext requestContext, String message) {debug(requestContext, message, null);}
+    public void warn(RequestContext requestContext, String message, List<Map<String, Object>> param, Throwable e) {
+        warn(requestContext, message, null, param, e);
+    }
 
     private static boolean isDebugEnabled(RequestContext requestContext) {
         return (null != requestContext && StringUtils.equalsIgnoreCase("true", requestContext.getDebugEnabled()));
     }
 
-    public void customLogFormat(RequestContext requestContext, String requestId, String msg, Map<String, Object> actor, Map<String, Object> object, Map<String, Object> params) {
-        Map<String, Object> edata = new HashMap<>();
-        Map<String, Object> eventMap = new HashMap<>();
-        edata.put("type", "system");
-        edata.put("level", "INFO");
-        edata.put("requestid", requestId);
-        edata.put("message", msg);
-        if(params != null)
-            edata.put("params", params);
-
-
-        eventMap.putAll(new HashMap<String, Object>(){{
-            put("eid", "LOG");
-            put("ets", System.currentTimeMillis());
-            put("ver", "3.0");
-            put("mid", "LOG:" + UUID.randomUUID().toString());
-
-            put("context", requestContext);
-            put("actor", actor);
-            if(object != null)
-                put("object", object);
-            put("edata", edata);
-        }});
-        info(eventMap);
+    private String jsonMapper(RequestContext requestContext, String message, Map<String, Object> object, List<Map<String, Object>> param) {
+        try {
+            return mapper.writeValueAsString(new CustomLogFormat(requestContext, message, object, param).getEventMap());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
-
 }

@@ -49,7 +49,7 @@ public class CertificateVerifierActor extends BaseActor {
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info(request.getRequestContext(), "onReceive method call start for operation {}" ,operation);
+        logger.info(request.getRequestContext(), "onReceive method call start for operation " + operation);
         if (JsonKey.VERIFY_CERT.equalsIgnoreCase(operation)) {
             verifyCertificate(request);
         }
@@ -160,7 +160,7 @@ public class CertificateVerifierActor extends BaseActor {
             String path = uri.getPath();
             idStr = path.substring(path.lastIndexOf('/') + 1);
         } catch (URISyntaxException e) {
-            logger.debug(null, "getFileName : exception occurred while getting file form the uri {}"+ e.getMessage(), e);
+            logger.debug(null, "getFileName : exception occurred while getting file form the uri {}"+ e.getMessage() + " error: " + e);
         }
         return idStr;
     }
@@ -197,7 +197,7 @@ public class CertificateVerifierActor extends BaseActor {
                     message = "ERROR: Assertion.expires - certificate has been expired";
                 }
             } catch (ParseException e) {
-                logger.info(null, "verifyExpiryDate : exception occurred parsing date {}" , e.getMessage());
+                logger.info(null, "verifyExpiryDate : exception occurred parsing date {}" + e.getMessage());
             }
         }
         return message;
