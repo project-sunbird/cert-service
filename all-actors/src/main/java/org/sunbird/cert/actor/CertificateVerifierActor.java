@@ -64,7 +64,7 @@ public class CertificateVerifierActor extends BaseActor {
             } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.ID)) {
                 certificate = downloadCert((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
             }
-            logger.debug(request.getRequestContext(), "Certificate extension {}" ,certificate);
+            logger.debug(request.getRequestContext(), "Certificate extension {}", null, certificate);
             List<String> certificateType = (List<String>) ((Map) certificate.get(JsonKey.VERIFICATION)).get(JsonKey.TYPE);
             if (JsonKey.HOSTED.equals(certificateType.get(0))) {
                 verificationResponse = verifyHostedCertificate(certificate);

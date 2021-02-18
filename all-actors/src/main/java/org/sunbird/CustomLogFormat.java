@@ -2,10 +2,7 @@ package org.sunbird;
 
 import org.sunbird.request.RequestContext;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class CustomLogFormat {
     private String edataType = "system";
@@ -14,9 +11,9 @@ public class CustomLogFormat {
     private Map<String, Object> edata = new HashMap<>();
     private Map<String, Object> eventMap = new HashMap<>();
 
-    CustomLogFormat(RequestContext requestContext, String msg, Map<String, Object> object, List<Map<String, Object>> params) {
+    CustomLogFormat(RequestContext requestContext, String msg, Map<String, Object> object, Map<String, Object> params) {
         if (params != null)
-            this.edata.put("params", params);
+            this.edata.put("params", new ArrayList<Map<String, Object>>(){{add(params);}});
         setEventMap(requestContext, msg);
         if (object != null)
             this.eventMap.put("object", object);

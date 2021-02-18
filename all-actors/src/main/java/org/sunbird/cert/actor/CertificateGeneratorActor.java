@@ -72,7 +72,7 @@ public class CertificateGeneratorActor extends BaseActor {
     private void generateSignUrl(Request request) {
       BaseStorageService storageService = null;
         try {
-            logger.info(request.getRequestContext(), "generateSignUrl:generate request got : {}", request.getRequest());
+            logger.info(request.getRequestContext(), "generateSignUrl:generate request got", null, request.getRequest());
             storageService = getStorageService();
             String uri = UrlManager.getContainerRelativePath((String) request.getRequest().get(JsonKey.PDF_URL));
             logger.info(request.getRequestContext(), "generateSignUrl:generate sign url method called for uri: " + uri);
@@ -115,7 +115,7 @@ public class CertificateGeneratorActor extends BaseActor {
     }
 
     private void generateCertificate(Request request) throws BaseException {
-        logger.info(request.getRequestContext(), "Request received== {}", request.getRequest());
+        logger.info(request.getRequestContext(), "Request received", null, request.getRequest());
         Map<String, String> properties = populatePropertiesMap(request);
 
         CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
