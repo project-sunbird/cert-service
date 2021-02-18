@@ -108,7 +108,7 @@ public class BaseController extends Controller {
 			Request request = new Request();
 			if (req.body() != null && req.body().asJson() != null) {
 				request = (Request) RequestMapper.mapRequest(req, Request.class);
-				request.setRequestContext(getRequestContext(req, operation, "API"));
+				request.setRequestContext(getRequestContext(req, operation, JsonKey.ACTOR_TYPE));
 			}
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
@@ -127,12 +127,12 @@ public class BaseController extends Controller {
 				JsonKey.SERVICE_NAME,
 				JsonKey.PRODUCER_NAME,
 				JsonKey.ENV,
-				httpRequest.header("x-device-id").orElse(null),
-				httpRequest.header("x-session-id").orElse(null),
-				"cert-service","1.0", null);
+				httpRequest.header(JsonKey.X_DEVICE_ID).orElse(null),
+				httpRequest.header(JsonKey.X_SESSION_ID).orElse(null),
+				JsonKey.PID,JsonKey.P_VERSION, null);
 		requestContext.setActorId(actorId);
 		requestContext.setActorType(actorType);
-		requestContext.setRequestId(httpRequest.header("x-trace-id").orElse(null));
+		requestContext.setRequestId(httpRequest.header(JsonKey.X_TRACE_ID).orElse(null));
 		return requestContext;
 	}
 

@@ -130,4 +130,10 @@ public interface JsonKey {
     String SERVICE_NAME = "cert-service";
     String PRODUCER_NAME = "org.sunbird.cert-service";
     String ENV = "cert-service";
+    String PID = "certificate-registry";
+    String P_VERSION = "1.0";
+    String ACTOR_TYPE = "API";
+    String X_DEVICE_ID = "x-device-id";
+    String X_SESSION_ID = "x-session-id";
+    String X_TRACE_ID = "x-trace-id";
 }
