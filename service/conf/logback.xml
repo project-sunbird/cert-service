@@ -56,8 +56,24 @@
         </encoder>
     </appender>
 
+    <appender name="customLoggerAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder"/>
+    </appender>
+
     <logger name="org.sunbird" level="INFO">
-        <appender-ref ref="defaultLoggerAppender"/>
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="DEBUG">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="WARN">
+        <appender-ref ref="customLoggerAppender"/>
+    </logger>
+
+    <logger name="org.sunbird" level="ERROR">
+        <appender-ref ref="customLoggerAppender"/>
     </logger>
 
     <root level="INFO">

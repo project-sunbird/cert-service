@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
 import org.sunbird.RequestValidatorFunction;
+import org.sunbird.incredible.processor.JsonKey;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
 import org.sunbird.request.RequestContext;
@@ -107,7 +108,7 @@ public class BaseController extends Controller {
 			Request request = new Request();
 			if (req.body() != null && req.body().asJson() != null) {
 				request = (Request) RequestMapper.mapRequest(req, Request.class);
-				request.setRequestContext(getRequestContext(req, operation));
+				request.setRequestContext(getRequestContext(req, operation, JsonKey.ACTOR_TYPE));
 			}
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
@@ -121,13 +122,17 @@ public class BaseController extends Controller {
 
 	}
 
-	private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
-		RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create("user_id")).orElse(null),
-				httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
-				httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
-				httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
-				(httpRequest.header("x-trace-enabled").isPresent() ? httpRequest.header("x-trace-enabled").orElse(debugEnabled): debugEnabled),
-				actorOperation);
+	private RequestContext getRequestContext(Http.Request httpRequest, String actorId, String actorType) {
+		RequestContext requestContext = new RequestContext(
+				JsonKey.SERVICE_NAME,
+				JsonKey.PRODUCER_NAME,
+				JsonKey.ENV,
+				httpRequest.header(JsonKey.X_DEVICE_ID).orElse(null),
+				httpRequest.header(JsonKey.X_SESSION_ID).orElse(null),
+				JsonKey.PID,JsonKey.P_VERSION, null);
+		requestContext.setActorId(actorId);
+		requestContext.setActorType(actorType);
+		requestContext.setRequestId(httpRequest.header(JsonKey.X_TRACE_ID).orElse(null));
 		return requestContext;
 	}
 

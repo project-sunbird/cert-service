@@ -127,4 +127,13 @@ public interface JsonKey {
     String QRCODE_IMAGE = "qrCodeImage";
     String EXPIRY_DATE = "expiryDate";
     String ISSUER_NAME = "issuerName";
+    String SERVICE_NAME = "cert-service";
+    String PRODUCER_NAME = "org.sunbird.cert-service";
+    String ENV = "cert-service";
+    String PID = "cert-service";
+    String P_VERSION = "1.0";
+    String ACTOR_TYPE = "API";
+    String X_DEVICE_ID = "x-device-id";
+    String X_SESSION_ID = "x-session-id";
+    String X_TRACE_ID = "x-trace-id";
 }
